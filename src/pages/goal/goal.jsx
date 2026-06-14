@@ -126,13 +126,13 @@ const GoalFormModal = ({
   onSubmit,
 }) => (
   <div
-    className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4 py-6"
+    className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-black/50 px-4 py-6 sm:items-center"
     role="dialog"
     aria-modal="true"
     onMouseDown={onClose}
   >
     <form
-      className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-5 shadow-xl"
+      className="max-h-[calc(100svh-3rem)] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-5 shadow-xl"
       onMouseDown={(event) => event.stopPropagation()}
       onSubmit={onSubmit}
     >
@@ -300,13 +300,13 @@ const GoalDetailModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 px-4 py-6"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/55 px-4 py-6 sm:items-center"
       role="dialog"
       aria-modal="true"
       onMouseDown={onClose}
     >
       <div
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl"
+        className="max-h-[calc(100svh-3rem)] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="flex items-center justify-between">

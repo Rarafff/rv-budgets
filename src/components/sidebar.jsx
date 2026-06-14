@@ -18,7 +18,7 @@ const Sidebar = ({ className = "", onClose }) => {
 
   return (
     <aside
-      className={`flex min-h-screen flex-col w-full border-b border-slate-200 bg-white px-4 py-5 md:sticky md:top-0 md:h-screen md:self-start md:w-[14vw] md:min-w-[180px] md:max-w-[240px] md:border-b-0 md:border-r md:px-5 cursor-pointer ${className}`}
+      className={`flex min-h-[100svh] flex-col w-full border-b border-slate-200 bg-white px-4 py-5 md:sticky md:top-0 md:h-[100svh] md:self-start md:w-[14vw] md:min-w-[180px] md:max-w-[240px] md:border-b-0 md:border-r md:px-5 cursor-pointer ${className}`}
     >
       <div className="flex w-full items-center justify-between gap-3">
         <div className="flex items-center gap-3">

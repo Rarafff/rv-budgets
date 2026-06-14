@@ -309,10 +309,10 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 px-4">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-950/40 px-4 py-6 sm:items-center">
           <form
             onSubmit={submitBill}
-            className="w-full max-w-lg rounded-xl bg-white p-5 shadow-xl"
+            className="max-h-[calc(100svh-3rem)] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-5 shadow-xl"
           >
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-slate-900">

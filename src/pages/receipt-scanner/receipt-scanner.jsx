@@ -258,7 +258,7 @@ const ReceiptScanner = () => {
       <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="grid gap-5 lg:grid-cols-[280px_1fr]">
           <div>
-            <label className="flex min-h-72 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center hover:bg-slate-100">
+            <div className="flex min-h-72 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
               {previewURL ? (
                 <img
                   src={previewURL}
@@ -287,13 +287,38 @@ const ReceiptScanner = () => {
                   </p>
                 </>
               )}
+            </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <input
+                id="receipt-camera-input"
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="sr-only"
+                onChange={handleFileChange}
+              />
+              <label
+                htmlFor="receipt-camera-input"
+                className="flex h-11 cursor-pointer items-center justify-center rounded-xl bg-blue-600 text-sm font-bold text-white hover:bg-blue-700"
+              >
+                Take Photo
+              </label>
+
+              <input
+                id="receipt-upload-input"
                 type="file"
                 accept="image/*"
                 className="sr-only"
                 onChange={handleFileChange}
               />
-            </label>
+              <label
+                htmlFor="receipt-upload-input"
+                className="flex h-11 cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50"
+              >
+                Upload Image
+              </label>
+            </div>
 
             <button
               type="button"

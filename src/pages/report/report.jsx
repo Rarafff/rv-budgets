@@ -352,13 +352,13 @@ const ExportModal = ({ report, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/55 px-4 py-6"
+      className="fixed inset-0 z-[70] flex items-start justify-center overflow-y-auto bg-black/55 px-4 py-6 sm:items-center"
       role="dialog"
       aria-modal="true"
       onMouseDown={onClose}
     >
       <div
-        className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl"
+        className="max-h-[calc(100svh-3rem)] w-full max-w-md overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-4">

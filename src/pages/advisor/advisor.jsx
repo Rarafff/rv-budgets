@@ -433,7 +433,7 @@ const Advisor = () => {
   };
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-48px)] w-full max-w-7xl flex-col px-4 md:px-8 xl:px-10">
+    <div className="mx-auto flex min-h-[calc(100svh-8rem)] w-full max-w-7xl flex-col px-4 md:h-[calc(100svh-48px)] md:min-h-0 md:px-8 xl:px-10">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">
