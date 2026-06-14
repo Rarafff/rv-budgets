@@ -99,14 +99,14 @@ const BudgetModal = ({
   onSubmit,
 }) => (
   <div
-    className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4 py-6"
+    className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-black/50 px-4 py-6 sm:items-center"
     role="dialog"
     aria-modal="true"
     aria-labelledby="budget-form-title"
     onMouseDown={onClose}
   >
     <form
-      className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl"
+      className="max-h-[calc(100svh-3rem)] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-5 shadow-xl"
       onMouseDown={(event) => event.stopPropagation()}
       onSubmit={onSubmit}
     >
