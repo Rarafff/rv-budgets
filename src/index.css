@@ -1,2 +1,75 @@
 @config "../tailwind.config.js";
 @import "tailwindcss";
+
+.fc .fc-event {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  text-align: end;
+}
+
+.fc .fc-daygrid-event {
+  margin: 0;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+@media (max-width: 640px) {
+  .calendar-compact .fc .fc-toolbar {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .calendar-compact .fc .fc-toolbar-title {
+    font-size: 1rem;
+    line-height: 1.2;
+  }
+
+  .calendar-compact .fc .fc-button {
+    padding: 0.2rem 0.45rem;
+    font-size: 0.75rem;
+  }
+
+  .calendar-compact .fc .fc-col-header-cell-cushion,
+  .calendar-compact .fc .fc-daygrid-day-number {
+    font-size: 0.7rem;
+  }
+
+  .calendar-compact .fc .fc-daygrid-event {
+    font-size: 0.65rem;
+  }
+
+  .calendar-compact .fc-amount {
+    color: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 0.75rem;
+  }
+
+  .calendar-compact .fc-amount::before {
+    content: "";
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 9999px;
+    background: var(--fc-dot-color, #94a3b8);
+  }
+
+  .calendar-compact .fc-amount:hover::after,
+  .calendar-compact .fc-amount:focus-visible::after {
+    content: attr(data-amount);
+    position: absolute;
+    z-index: 10;
+    margin-top: -1.4rem;
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.25rem;
+    background: #111827;
+    color: #ffffff;
+    font-size: 0.65rem;
+    line-height: 1;
+    white-space: nowrap;
+  }
+}

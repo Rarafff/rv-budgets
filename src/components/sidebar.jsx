@@ -1,13 +1,32 @@
+import { NavLink, useNavigate } from "react-router-dom";
+import { clearAuth } from "../utils/auth";
+import logo from "../assets/logo.svg";
+
 const Sidebar = ({ className = "", onClose }) => {
+  const navigate = useNavigate();
+
+  const linkClass = ({ isActive }) =>
+    `block rounded-xl px-3 py-2 ${
+      isActive ? "bg-blue-100 text-blue-700" : "hover:bg-slate-100"
+    }`;
+
+  const handleLogout = () => {
+    clearAuth();
+    onClose?.();
+    navigate("/login", { replace: true });
+  };
+
   return (
     <aside
-      className={`flex min-h-screen flex-col w-full border-b border-slate-100 bg-white px-4 py-5 md:h-screen md:w-[14vw] md:min-w-[180px] md:max-w-[240px] md:border-b-0 md:border-r md:px-5 cursor-pointer ${className}`}
+      className={`flex min-h-screen flex-col w-full border-b border-slate-200 bg-white px-4 py-5 md:sticky md:top-0 md:h-screen md:self-start md:w-[14vw] md:min-w-[180px] md:max-w-[240px] md:border-b-0 md:border-r md:px-5 cursor-pointer ${className}`}
     >
       <div className="flex w-full items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-200 text-sm font-bold text-rose-700">
-            RV.
-          </div>
+          <img
+            src={logo}
+            alt="Budgets logo"
+            className="h-9 w-9 rounded-xl object-cover"
+          />
           <div className="text-lg font-semibold tracking-tight">Budgets.</div>
         </div>
         <button
@@ -22,32 +41,69 @@ const Sidebar = ({ className = "", onClose }) => {
 
       <nav className="mt-6 flex-1 min-h-0 overflow-y-auto">
         <ul className="space-y-1 text-sm font-medium text-slate-700">
-          <li className="rounded-xl bg-rose-200 px-3 py-2 text-rose-900">
-            Home
+          <li>
+            <NavLink to="/" end className={linkClass} onClick={onClose}>
+              Home
+            </NavLink>
           </li>
-          <li className="rounded-xl px-3 py-2 hover:bg-slate-100">Dompet</li>
-          <li className="rounded-xl px-3 py-2 hover:bg-slate-100">Trans</li>
-          <li className="rounded-xl px-3 py-2 hover:bg-slate-100">Budget</li>
-          <li className="rounded-xl px-3 py-2 hover:bg-slate-100">Scanner</li>
-          <li className="rounded-xl px-3 py-2 hover:bg-slate-100">Goals</li>
-          <li className="rounded-xl px-3 py-2 hover:bg-slate-100">Aset</li>
-          <li className="rounded-xl px-3 py-2 hover:bg-slate-100">Utang</li>
-          <li className="rounded-xl px-3 py-2 hover:bg-slate-100">Investasi</li>
-          <li className="rounded-xl px-3 py-2 hover:bg-slate-100">
-            AI Advisor
+          <li>
+            <NavLink to="/wallet" className={linkClass} onClick={onClose}>
+              Wallet
+            </NavLink>
           </li>
-          <li className="rounded-xl px-3 py-2 hover:bg-slate-100">Laporan</li>
-          <li className="rounded-xl px-3 py-2 hover:bg-slate-100">Profil</li>
+          <li>
+            <NavLink to="/transactions" className={linkClass} onClick={onClose}>
+              Transactions
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/budget" className={linkClass} onClick={onClose}>
+              Budget
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/goals" className={linkClass} onClick={onClose}>
+              Goals
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/assets" className={linkClass} onClick={onClose}>
+              Asset
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/couple" className={linkClass} onClick={onClose}>
+              Couple
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/advisor" className={linkClass} onClick={onClose}>
+              AI Advisor
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/report" className={linkClass} onClick={onClose}>
+              Report
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/profile" className={linkClass} onClick={onClose}>
+              Profile
+            </NavLink>
+          </li>
         </ul>
       </nav>
 
-      <div className="mt-auto border-t border-slate-100 pt-4">
+      <div className="mt-auto border-t border-slate-200 pt-4">
         <ul className="space-y-1 text-sm font-medium text-slate-600">
-          <li className="rounded-xl px-3 py-2 hover:bg-slate-100">Yang Baru</li>
           <li className="rounded-xl px-3 py-2 hover:bg-slate-100">
-            Mode Gelap
+            What's New
           </li>
-          <li className="rounded-xl px-3 py-2 text-rose-600 hover:bg-rose-50">
+          <li className="rounded-xl px-3 py-2 hover:bg-slate-100">Dark Mode</li>
+          <li
+            className="rounded-xl px-3 py-2 text-rose-600 hover:bg-rose-50"
+            onClick={handleLogout}
+          >
             Logout
           </li>
         </ul>
