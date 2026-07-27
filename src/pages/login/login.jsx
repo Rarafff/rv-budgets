@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../api/auth";
 import { saveAuth } from "../../utils/auth";
 import logo from "../../assets/logo.svg";
+import LanguageToggle from "../../components/language-toggle";
+import { useTranslation } from "../../i18n/use-translation";
 
 const MailIcon = () => (
   <svg
@@ -38,6 +40,7 @@ const LockIcon = () => (
 
 const Login = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -81,7 +84,7 @@ const Login = () => {
         requestError.response?.data?.error ||
           requestError.response?.data?.message ||
           requestError.message ||
-          "Login failed. Please try again.",
+          t("auth.loginFailed"),
       );
     } finally {
       setIsSubmitting(false);
@@ -92,6 +95,9 @@ const Login = () => {
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10 text-slate-900">
       <div className="w-full max-w-xl">
         <div className="text-center">
+          <div className="mb-5 flex justify-center">
+            <LanguageToggle />
+          </div>
           <img
             src={logo}
             alt="Budgets logo"
@@ -99,7 +105,7 @@ const Login = () => {
           />
           <h1 className="mt-6 text-4xl font-black tracking-tight">Budgets.</h1>
           <p className="mt-4 text-xl font-medium text-slate-500">
-            Personal finance management app.
+            {t("auth.tagline")}
           </p>
         </div>
 
@@ -111,7 +117,7 @@ const Login = () => {
             <MailIcon />
             <input
               type="email"
-              placeholder="Email Address"
+              placeholder={t("auth.email")}
               value={form.email}
               onChange={updateField("email")}
               className="min-w-0 flex-1 bg-transparent text-xl font-semibold text-slate-900 outline-none placeholder:text-slate-400"
@@ -123,7 +129,7 @@ const Login = () => {
             <LockIcon />
             <input
               type="password"
-              placeholder="Password"
+              placeholder={t("auth.password")}
               value={form.password}
               onChange={updateField("password")}
               className="min-w-0 flex-1 bg-transparent text-xl font-semibold text-slate-900 outline-none placeholder:text-slate-400"
@@ -139,14 +145,14 @@ const Login = () => {
                 onChange={updateCheckbox("rememberMe")}
                 className="size-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
               />
-              Remember me
+              {t("auth.rememberMe")}
             </label>
             <button
               type="button"
               className="text-slate-500 hover:text-blue-700"
               onClick={() => navigate("/forgot-password")}
             >
-              Forgot Password?
+              {t("auth.forgotPassword")}
             </button>
           </div>
 
@@ -161,13 +167,13 @@ const Login = () => {
             disabled={isSubmitting}
             className="mt-7 h-16 w-full rounded-2xl bg-blue-600 text-xl font-black text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
           >
-            {isSubmitting ? "Logging in..." : "Login"}
+            {isSubmitting ? t("auth.loggingIn") : t("auth.login")}
           </button>
 
           <p className="mt-8 text-center text-lg font-bold text-slate-500">
-            Don&apos;t have an account?{" "}
+            {t("auth.noAccount")}{" "}
             <Link to="/register" className="hover:text-blue-700">
-              Register
+              {t("auth.register")}
             </Link>
           </p>
         </form>

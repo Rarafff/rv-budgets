@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { getMonthlyReport } from "../../api/report";
+import { useTranslation } from "../../i18n/use-translation";
 
 const currentMonth = () => new Date().toISOString().slice(0, 7);
 
@@ -12,9 +13,9 @@ const formatMoney = (amount) =>
 
 const formatPercent = (amount) => `${Number(amount || 0).toFixed(1)}%`;
 
-const formatDate = (date) => {
+const formatDate = (date, language = "id") => {
   if (!date) return "-";
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat(language === "id" ? "id-ID" : "en-US", {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -49,6 +50,7 @@ const StatCard = ({ label, value, tone = "slate" }) => {
 };
 
 const HealthScore = ({ health }) => {
+  const { t } = useTranslation();
   const score = Number(health?.score || 0);
   const dash = `${Math.min(score / 100, 1) * 264} 264`;
 
@@ -76,18 +78,20 @@ const HealthScore = ({ health }) => {
         </div>
 
         <div>
-          <h2 className="text-lg font-bold text-slate-900">Financial Health Score</h2>
+          <h2 className="text-lg font-bold text-slate-900">
+            {t("report.financialHealthScore")}
+          </h2>
           <p className="mt-1 text-sm font-medium text-slate-500">
-            Based on savings ratio, budget discipline, emergency runway, and debt.
+            {t("report.healthDescription")}
           </p>
           <span className="mt-3 inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
-            {health?.label || "No Data"}
+            {health?.label || t("report.noData")}
           </span>
           <div className="mt-5 grid gap-4 md:grid-cols-4">
-            <HealthMetric label="Savings Ratio" value={formatPercent(health?.savingsRatio)} progress={health?.savingsRatio} />
-            <HealthMetric label="Budget Discipline" value={formatPercent(health?.budgetDiscipline)} progress={health?.budgetDiscipline} />
-            <HealthMetric label="Runway" value={`${Number(health?.runwayMonths || 0).toFixed(1)} mo`} progress={(Number(health?.runwayMonths || 0) / 6) * 100} />
-            <HealthMetric label="Debt Ratio" value={formatPercent(health?.debtRatio)} progress={100 - Number(health?.debtRatio || 0)} />
+            <HealthMetric label={t("report.savingsRatio")} value={formatPercent(health?.savingsRatio)} progress={health?.savingsRatio} />
+            <HealthMetric label={t("report.budgetDiscipline")} value={formatPercent(health?.budgetDiscipline)} progress={health?.budgetDiscipline} />
+            <HealthMetric label={t("report.runway")} value={`${Number(health?.runwayMonths || 0).toFixed(1)} mo`} progress={(Number(health?.runwayMonths || 0) / 6) * 100} />
+            <HealthMetric label={t("report.debtRatio")} value={formatPercent(health?.debtRatio)} progress={100 - Number(health?.debtRatio || 0)} />
           </div>
         </div>
       </div>
@@ -111,6 +115,7 @@ const HealthMetric = ({ label, value, progress }) => (
 );
 
 const CategoryBreakdown = ({ categories }) => {
+  const { t } = useTranslation();
   const topCategory = categories[0];
   const circumference = 258;
   let offset = 0;
@@ -119,7 +124,9 @@ const CategoryBreakdown = ({ categories }) => {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <Card className="flex min-h-[360px] flex-col">
-        <h2 className="text-lg font-bold text-slate-900">Expense Breakdown</h2>
+        <h2 className="text-lg font-bold text-slate-900">
+          {t("report.expenseBreakdown")}
+        </h2>
         <div className="flex flex-1 items-center justify-center">
           <div className="relative mx-auto size-72 max-w-full">
             <svg viewBox="0 0 120 120" className="size-full -rotate-90">
@@ -150,7 +157,7 @@ const CategoryBreakdown = ({ categories }) => {
                   {topCategory ? formatPercent(topCategory.percent) : "0.0%"}
                 </p>
                 <p className="mt-1 text-base font-bold text-slate-400">
-                  {topCategory?.category || "No expense"}
+                  {topCategory?.category || t("report.noExpense")}
                 </p>
               </div>
             </div>
@@ -159,10 +166,12 @@ const CategoryBreakdown = ({ categories }) => {
       </Card>
 
       <Card>
-        <h2 className="text-lg font-bold text-slate-900">Top Categories</h2>
+        <h2 className="text-lg font-bold text-slate-900">
+          {t("report.topCategories")}
+        </h2>
         <div className="mt-4 max-h-80 space-y-3 overflow-y-auto pr-2">
           {categories.length === 0 ? (
-            <EmptyState text="No expense categories for this month." />
+            <EmptyState text={t("report.noExpenseCategories")} />
           ) : (
             categories.map((category, index) => (
               <article key={category.category} className="flex items-center gap-3 rounded-xl bg-slate-50 p-4">
@@ -188,18 +197,24 @@ const CategoryBreakdown = ({ categories }) => {
 };
 
 const DailyChart = ({ days }) => {
+  const { t } = useTranslation();
   const max = Math.max(...days.map((day) => Number(day.amount || 0)), 0);
 
   return (
     <Card>
-      <h2 className="text-lg font-bold text-slate-900">Daily Spending</h2>
+      <h2 className="text-lg font-bold text-slate-900">
+        {t("report.dailySpending")}
+      </h2>
       <div className="mt-5 flex h-56 items-end gap-1 rounded-xl border-l border-b border-dashed border-slate-300 px-3 pb-2">
         {days.map((day) => (
           <div
             key={day.date}
             className="flex-1 rounded-t bg-rose-300"
             style={{ height: `${max > 0 ? Math.max((day.amount / max) * 100, day.amount ? 4 : 0) : 0}%` }}
-            title={`Day ${day.day}: ${formatMoney(day.amount)}`}
+            title={t("report.dayTitle", {
+              day: day.day,
+              amount: formatMoney(day.amount),
+            })}
           />
         ))}
       </div>
@@ -208,14 +223,17 @@ const DailyChart = ({ days }) => {
 };
 
 const BudgetPerformance = ({ rows, showAll, onToggleShowAll }) => {
+  const { t } = useTranslation();
   const visibleRows = showAll ? rows : rows.slice(0, 6);
 
   return (
     <Card className="p-6 md:p-8">
-      <h2 className="text-lg font-bold text-slate-900">Budget Performance</h2>
+      <h2 className="text-lg font-bold text-slate-900">
+        {t("report.budgetPerformance")}
+      </h2>
       {rows.length === 0 ? (
         <div className="mt-5">
-          <EmptyState text="No budgets found for this month." />
+          <EmptyState text={t("report.noBudgets")} />
         </div>
       ) : (
         <>
@@ -223,11 +241,11 @@ const BudgetPerformance = ({ rows, showAll, onToggleShowAll }) => {
             <table className="w-full min-w-[760px] table-fixed text-left text-sm">
               <thead>
                 <tr className="border-b border-slate-100 text-xs font-black uppercase tracking-wide text-slate-400">
-                  <th className="px-4 py-4">Category</th>
-                  <th className="px-4 py-4 text-right">Allocation</th>
-                  <th className="px-4 py-4 text-right">Used</th>
-                  <th className="px-4 py-4">Progress</th>
-                  <th className="px-4 py-4 text-right">% Used</th>
+                  <th className="px-4 py-4">{t("report.category")}</th>
+                  <th className="px-4 py-4 text-right">{t("report.allocation")}</th>
+                  <th className="px-4 py-4 text-right">{t("report.used")}</th>
+                  <th className="px-4 py-4">{t("report.progress")}</th>
+                  <th className="px-4 py-4 text-right">{t("report.percentUsed")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -259,7 +277,9 @@ const BudgetPerformance = ({ rows, showAll, onToggleShowAll }) => {
               onClick={onToggleShowAll}
               className="mt-4 h-11 w-full rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50"
             >
-              {showAll ? "Close" : `View All (${rows.length} categories)`}
+              {showAll
+                ? t("report.close")
+                : t("report.viewAllCategories", { count: rows.length })}
             </button>
           )}
         </>
@@ -268,12 +288,17 @@ const BudgetPerformance = ({ rows, showAll, onToggleShowAll }) => {
   );
 };
 
-const GoalProgress = ({ goals }) => (
+const GoalProgress = ({ goals }) => {
+  const { t } = useTranslation();
+
+  return (
   <Card>
-    <h2 className="text-lg font-bold text-slate-900">Goal Progress</h2>
+    <h2 className="text-lg font-bold text-slate-900">
+      {t("report.goalProgress")}
+    </h2>
     <div className="mt-5 space-y-5">
       {goals.length === 0 ? (
-        <EmptyState text="No goals found yet." />
+        <EmptyState text={t("report.noGoals")} />
       ) : (
         goals.map((goal) => (
           <div key={goal.id}>
@@ -301,11 +326,17 @@ const GoalProgress = ({ goals }) => (
       )}
     </div>
   </Card>
-);
+  );
+};
 
-const DebtSummary = ({ debtBalance, cashBalance }) => (
+const DebtSummary = ({ debtBalance, cashBalance }) => {
+  const { t } = useTranslation();
+
+  return (
   <Card className="flex min-h-[290px] flex-col">
-    <h2 className="text-lg font-bold text-slate-900">Debt Summary</h2>
+    <h2 className="text-lg font-bold text-slate-900">
+      {t("report.debtSummary")}
+    </h2>
     <div className="flex flex-1 flex-col items-center justify-center text-center">
       <span className={`inline-flex size-12 items-center justify-center rounded-2xl ${debtBalance > 0 ? "bg-rose-50 text-rose-600" : "bg-blue-50 text-blue-600"}`}>
         <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -313,16 +344,18 @@ const DebtSummary = ({ debtBalance, cashBalance }) => (
         </svg>
       </span>
       <p className="mt-3 text-sm font-bold text-slate-700">
-        {debtBalance > 0 ? formatMoney(debtBalance) : "No debt recorded."}
+        {debtBalance > 0 ? formatMoney(debtBalance) : t("report.noDebt")}
       </p>
       <p className="mt-1 text-xs font-medium text-slate-400">
-        Cash balance: {formatMoney(cashBalance)}
+        {t("report.cashBalance", { amount: formatMoney(cashBalance) })}
       </p>
     </div>
   </Card>
-);
+  );
+};
 
 const ExportModal = ({ report, onClose }) => {
+  const { t } = useTranslation();
   const downloadCSV = () => {
     const rows = [
       ["Metric", "Value"],
@@ -362,25 +395,29 @@ const ExportModal = ({ report, onClose }) => {
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-xl font-bold text-slate-900">Export Data</h2>
+          <h2 className="text-xl font-bold text-slate-900">
+            {t("report.exportData")}
+          </h2>
           <button
             type="button"
             onClick={onClose}
             className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-            aria-label="Close export modal"
+            aria-label={t("report.closeExportModal")}
           >
             x
           </button>
         </div>
         <p className="mt-4 text-sm font-semibold text-slate-500">
-          Download a CSV summary for {report?.period?.month || "this month"}.
+          {t("report.downloadCsvSummary", {
+            period: report?.period?.month || t("report.thisMonth"),
+          })}
         </p>
         <button
           type="button"
           onClick={downloadCSV}
           className="mt-5 h-12 w-full rounded-xl bg-blue-600 text-sm font-bold text-white shadow-sm shadow-blue-200 hover:bg-blue-700"
         >
-          Download CSV
+          {t("report.downloadCsv")}
         </button>
       </div>
     </div>
@@ -394,6 +431,7 @@ const EmptyState = ({ text }) => (
 );
 
 const Report = () => {
+  const { language, t } = useTranslation();
   const [periodMonth, setPeriodMonth] = useState(currentMonth());
   const [report, setReport] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -416,7 +454,7 @@ const Report = () => {
         requestError.response?.data?.error ||
           requestError.response?.data?.message ||
           requestError.message ||
-          "Failed to load report.",
+          t("report.failedLoad"),
       );
     } finally {
       setIsLoading(false);
@@ -425,19 +463,21 @@ const Report = () => {
 
   const monthLabel = useMemo(() => {
     const [year, month] = periodMonth.split("-");
-    return new Intl.DateTimeFormat("id-ID", {
+    return new Intl.DateTimeFormat(language === "id" ? "id-ID" : "en-US", {
       month: "long",
       year: "numeric",
     }).format(new Date(Number(year), Number(month) - 1, 1));
-  }, [periodMonth]);
+  }, [language, periodMonth]);
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 md:px-8 xl:px-10">
       <header className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Analysis</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+            {t("report.analysis")}
+          </h1>
           <p className="mt-1 text-sm font-medium text-slate-500">
-            Analyze your financial habits.
+            {t("report.subtitle")}
           </p>
           <input
             type="month"
@@ -451,7 +491,7 @@ const Report = () => {
           onClick={() => setShowExportModal(true)}
           className="inline-flex size-10 items-center justify-center rounded-xl border border-slate-100 bg-white text-blue-600 shadow-sm hover:bg-blue-50 disabled:opacity-50"
           disabled={!report}
-          aria-label="Download report"
+          aria-label={t("report.downloadReport")}
         >
           <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 3v12" />
@@ -469,17 +509,17 @@ const Report = () => {
 
       {isLoading ? (
         <div className="mt-6 rounded-2xl border border-slate-100 bg-white p-5 text-sm font-bold text-slate-500">
-          Loading report...
+          {t("report.loadingReport")}
         </div>
       ) : report ? (
         <div className="mt-6 space-y-6">
           <HealthScore health={report.healthScore} />
 
           <div className="grid gap-4 md:grid-cols-4">
-            <StatCard label="Saved" value={formatMoney(report.saved)} tone="blue" />
-            <StatCard label="Savings Ratio" value={formatPercent(report.savingsRatio)} tone="amber" />
-            <StatCard label="Income" value={formatMoney(report.income)} tone="emerald" />
-            <StatCard label="Expense" value={formatMoney(report.expense)} tone="rose" />
+            <StatCard label={t("report.saved")} value={formatMoney(report.saved)} tone="blue" />
+            <StatCard label={t("report.savingsRatio")} value={formatPercent(report.savingsRatio)} tone="amber" />
+            <StatCard label={t("report.income")} value={formatMoney(report.income)} tone="emerald" />
+            <StatCard label={t("report.expense")} value={formatMoney(report.expense)} tone="rose" />
           </div>
 
           <CategoryBreakdown categories={report.topCategories || []} />
@@ -487,20 +527,35 @@ const Report = () => {
           <div className="grid gap-6 lg:grid-cols-2">
             <DailyChart days={report.dailySpending || []} />
             <Card>
-              <h2 className="text-lg font-bold text-slate-900">Quick Summary</h2>
+              <h2 className="text-lg font-bold text-slate-900">
+                {t("report.quickSummary")}
+              </h2>
               <div className="mt-6 space-y-5">
                 {[
-                  ["Period", monthLabel],
-                  ["Average daily expense", `${formatMoney(report.averageDailyExpense)}/day`],
+                  [t("report.period"), monthLabel],
                   [
-                    "Highest spending day",
+                    t("report.averageDailyExpense"),
+                    t("report.perDay", {
+                      amount: formatMoney(report.averageDailyExpense),
+                    }),
+                  ],
+                  [
+                    t("report.highestSpendingDay"),
                     report.highestSpendingDay
-                      ? `${formatDate(report.highestSpendingDay.date)} - ${formatMoney(report.highestSpendingDay.amount)}`
+                      ? `${formatDate(report.highestSpendingDay.date, language)} - ${formatMoney(report.highestSpendingDay.amount)}`
                       : "-",
                   ],
-                  ["Total transactions", `${report.transactionCount || 0} transactions`],
-                  ["No-spend days", `${report.noSpendDays || 0} days`],
-                  ["Goal contributions", formatMoney(report.goalContributions)],
+                  [
+                    t("report.totalTransactions"),
+                    t("report.transactions", {
+                      count: report.transactionCount || 0,
+                    }),
+                  ],
+                  [
+                    t("report.noSpendDays"),
+                    t("report.days", { count: report.noSpendDays || 0 }),
+                  ],
+                  [t("report.goalContributions"), formatMoney(report.goalContributions)],
                 ].map(([label, value]) => (
                   <div key={label} className="flex justify-between gap-4 border-b border-slate-100 pb-4 text-sm last:border-0">
                     <span className="font-semibold text-slate-500">{label}</span>
@@ -527,7 +582,7 @@ const Report = () => {
         </div>
       ) : (
         <div className="mt-6">
-          <EmptyState text="No report data available." />
+          <EmptyState text={t("report.noReportData")} />
         </div>
       )}
 

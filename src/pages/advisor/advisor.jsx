@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { askAdvisor, getAdvisorMessages, getAdvisorThreads } from "../../api/advisor";
+import { useTranslation } from "../../i18n/use-translation";
 
 const currentMonth = () => new Date().toISOString().slice(0, 7);
 
@@ -69,11 +70,11 @@ const SendIcon = () => (
   </svg>
 );
 
-const suggestedQuestions = [
-  "What should I improve this month?",
-  "Am I overspending anywhere?",
-  "How can I reach my goals faster?",
-  "Review my budget risks.",
+const suggestedQuestionKeys = [
+  "advisor.question.improve",
+  "advisor.question.overspending",
+  "advisor.question.goals",
+  "advisor.question.risks",
 ];
 
 const renderInline = (text) => {
@@ -271,13 +272,14 @@ const AdviceContent = ({ content }) => {
 };
 
 const Advisor = () => {
+  const { language, t } = useTranslation();
   const [periodMonth, setPeriodMonth] = useState(currentMonth());
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState([
     {
       role: "assistant",
       content:
-        "Ask me about your budget, spending, wallets, or goals. I will use your real monthly report data.",
+        t("advisor.initialMessage"),
     },
   ]);
   const [threads, setThreads] = useState([]);
@@ -295,11 +297,11 @@ const Advisor = () => {
 
   const monthLabel = useMemo(() => {
     const [year, month] = periodMonth.split("-");
-    return new Intl.DateTimeFormat("id-ID", {
+    return new Intl.DateTimeFormat(language === "id" ? "id-ID" : "en-US", {
       month: "long",
       year: "numeric",
     }).format(new Date(Number(year), Number(month) - 1, 1));
-  }, [periodMonth]);
+  }, [language, periodMonth]);
 
   const loadThreads = async () => {
     setIsLoadingThreads(true);
@@ -311,7 +313,7 @@ const Advisor = () => {
         requestError.response?.data?.error ||
           requestError.response?.data?.message ||
           requestError.message ||
-          "Failed to load advisor history.",
+          t("advisor.failedHistory"),
       );
     } finally {
       setIsLoadingThreads(false);
@@ -338,7 +340,7 @@ const Advisor = () => {
           : [
               {
                 role: "assistant",
-                content: "This chat does not have messages yet.",
+                content: t("advisor.emptyThread"),
               },
             ],
       );
@@ -357,7 +359,7 @@ const Advisor = () => {
         requestError.response?.data?.error ||
           requestError.response?.data?.message ||
           requestError.message ||
-          "Failed to load advisor messages.",
+          t("advisor.failedMessages"),
       );
     }
   };
@@ -388,7 +390,7 @@ const Advisor = () => {
         ...current,
         {
           role: "assistant",
-          content: response.data.advice || "No advice returned.",
+          content: response.data.advice || t("advisor.noAdvice"),
           model: response.data.model || "",
         },
       ]);
@@ -404,13 +406,13 @@ const Advisor = () => {
         requestError.response?.data?.error ||
         requestError.response?.data?.message ||
         requestError.message ||
-        "Failed to ask advisor.";
+        t("advisor.failedAsk");
       setError(message);
       setMessages((current) => [
         ...current,
         {
           role: "assistant",
-          content: "I could not generate advice right now. Please try again.",
+          content: t("advisor.failedGenerate"),
         },
       ]);
     } finally {
@@ -424,7 +426,7 @@ const Advisor = () => {
       {
         role: "assistant",
         content:
-          "New chat started. Ask anything about your current monthly financial data.",
+          t("advisor.newChatStarted"),
       },
     ]);
     setSnapshot(null);
@@ -437,10 +439,10 @@ const Advisor = () => {
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            AI Advisor
+            {t("advisor.title")}
           </h1>
           <p className="mt-1 text-sm font-medium text-slate-500">
-            Advice based on your real wallets, budgets, transactions, and goals.
+            {t("advisor.subtitle")}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -455,7 +457,7 @@ const Advisor = () => {
             onClick={newChat}
             className="h-10 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-600 hover:bg-slate-50"
           >
-            New Chat
+            {t("advisor.newChat")}
           </button>
         </div>
       </header>
@@ -470,16 +472,16 @@ const Advisor = () => {
         <aside className="border-b border-slate-100 bg-slate-50/60 p-4 lg:border-b-0 lg:border-r">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">
-              History
+              {t("advisor.history")}
             </p>
             <div className="mt-3 max-h-48 space-y-2 overflow-y-auto pr-1">
               {isLoadingThreads ? (
                 <p className="rounded-xl bg-white p-3 text-xs font-bold text-slate-400">
-                  Loading history...
+                  {t("advisor.loadingHistory")}
                 </p>
               ) : threads.length === 0 ? (
                 <p className="rounded-xl border border-dashed border-slate-200 bg-white p-3 text-xs font-semibold leading-5 text-slate-500">
-                  No advisor chats yet.
+                  {t("advisor.noChats")}
                 </p>
               ) : (
                 threads.map((thread) => (
@@ -495,7 +497,7 @@ const Advisor = () => {
                   >
                     <p className="truncate text-sm font-bold">{thread.title}</p>
                     <p className="mt-1 text-xs font-medium opacity-70">
-                      {thread.periodMonth || "No period"}
+                      {thread.periodMonth || t("advisor.noPeriod")}
                     </p>
                   </button>
                 ))
@@ -505,39 +507,41 @@ const Advisor = () => {
 
           <div className="mt-6 border-t border-slate-200 pt-5">
           <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">
-            Context
+            {t("advisor.context")}
           </p>
           <p className="mt-2 text-sm font-bold text-slate-900">{monthLabel}</p>
 
           {snapshot ? (
             <div className="mt-4 space-y-3">
-              <ContextRow label="Income" value={formatMoney(snapshot.income)} />
-              <ContextRow label="Expense" value={formatMoney(snapshot.expense)} />
-              <ContextRow label="Net" value={formatMoney(snapshot.net)} />
+              <ContextRow label={t("advisor.income")} value={formatMoney(snapshot.income)} />
+              <ContextRow label={t("advisor.expense")} value={formatMoney(snapshot.expense)} />
+              <ContextRow label={t("advisor.net")} value={formatMoney(snapshot.net)} />
               <ContextRow
-                label="Health"
+                label={t("advisor.health")}
                 value={`${snapshot.healthScore?.score || 0}/100`}
               />
               <ContextRow
-                label="Top risk"
-                value={snapshot.topCategories?.[0]?.category || "No expense"}
+                label={t("advisor.topRisk")}
+                value={snapshot.topCategories?.[0]?.category || t("advisor.noExpense")}
               />
             </div>
           ) : (
             <p className="mt-4 rounded-xl border border-dashed border-slate-200 bg-white p-3 text-xs font-semibold leading-5 text-slate-500">
-              Ask a question to load this month&apos;s financial snapshot.
+              {t("advisor.loadSnapshot")}
             </p>
           )}
           </div>
 
           <div className="mt-6">
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">
-              Try Asking
+              {t("advisor.tryAsking")}
             </p>
             <div className="mt-3 space-y-2">
-              {suggestedQuestions.map((item) => (
+              {suggestedQuestionKeys.map((key) => {
+                const item = t(key);
+                return (
                 <button
-                  key={item}
+                  key={key}
                   type="button"
                   onClick={(event) => sendQuestion(event, item)}
                   disabled={isLoading}
@@ -545,7 +549,8 @@ const Advisor = () => {
                 >
                   {item}
                 </button>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -582,7 +587,7 @@ const Advisor = () => {
               <div className="flex items-start gap-3">
                 <AdvisorIcon />
                 <div className="rounded-2xl bg-slate-100 px-4 py-3 text-sm font-bold text-slate-500">
-                  Reading your report and thinking...
+                  {t("advisor.thinking")}
                 </div>
               </div>
             )}
@@ -592,7 +597,7 @@ const Advisor = () => {
             <div className="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
               <input
                 className="min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400"
-                placeholder="Ask anything about your finances..."
+                placeholder={t("advisor.placeholder")}
                 value={question}
                 onChange={(event) => setQuestion(event.target.value)}
                 disabled={isLoading}
@@ -601,13 +606,13 @@ const Advisor = () => {
                 type="submit"
                 disabled={isLoading || !question.trim()}
                 className="inline-flex size-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200 hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
-                aria-label="Send message"
+                aria-label={t("advisor.sendMessage")}
               >
                 <SendIcon />
               </button>
             </div>
             <p className="mt-2 text-[10px] font-medium text-slate-400">
-              AI suggestions are informational. Review before applying changes.
+              {t("advisor.disclaimer")}
             </p>
           </form>
         </div>

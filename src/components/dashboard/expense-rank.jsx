@@ -1,3 +1,5 @@
+import { useTranslation } from "../../i18n/use-translation";
+
 const expenseIcons = {
   food: (
     <svg
@@ -71,6 +73,7 @@ const formatMoney = (amount) =>
   `Rp ${Number(amount || 0).toLocaleString("id-ID")}`;
 
 const ExpenseRank = ({ summary, isLoading }) => {
+  const { t } = useTranslation();
   const expenses = summary?.expenseByCategory || [];
   const remaining = summary?.budgetRemaining || 0;
   const budgetLimit = summary?.budgetLimit || 0;
@@ -86,18 +89,22 @@ const ExpenseRank = ({ summary, isLoading }) => {
     <div className="mt-6 grid gap-6 lg:grid-cols-2">
       <div className="biggest-expense flex h-72 flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-lg font-bold text-slate-900">Top Expenses</h2>
-          <p className="text-xs font-medium text-slate-500">This month</p>
+          <h2 className="text-lg font-bold text-slate-900">
+            {t("dashboard.topExpenses")}
+          </h2>
+          <p className="text-xs font-medium text-slate-500">
+            {t("dashboard.thisMonth")}
+          </p>
         </div>
 
         <div className="mt-4 min-h-0 flex-1 space-y-3 overflow-y-auto pr-2">
           {isLoading ? (
             <p className="rounded-xl bg-slate-50 px-3 py-3 text-sm font-bold text-slate-500">
-              Loading expenses...
+              {t("dashboard.loadingExpenses")}
             </p>
           ) : expenses.length === 0 ? (
             <p className="rounded-xl bg-slate-50 px-3 py-3 text-sm font-bold text-slate-500">
-              No expenses this month.
+              {t("dashboard.noExpensesThisMonth")}
             </p>
           ) : expenses.map((expense) => (
             <div
@@ -112,7 +119,7 @@ const ExpenseRank = ({ summary, isLoading }) => {
                   {expense.category}
                 </p>
                 <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                  This month
+                  {t("dashboard.thisMonth")}
                 </p>
               </div>
               <p className="ml-auto whitespace-nowrap text-sm font-bold text-slate-900">
@@ -126,23 +133,25 @@ const ExpenseRank = ({ summary, isLoading }) => {
       <div className="budget-realization flex h-72 flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Budget Usage</h2>
+            <h2 className="text-lg font-bold text-slate-900">
+              {t("dashboard.budgetUsage")}
+            </h2>
             <p className="mt-1 text-xs font-medium text-slate-500">
-              Monthly allocation overview
+              {t("dashboard.monthlyAllocationOverview")}
             </p>
           </div>
           <button
             type="button"
             className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-50"
           >
-            Export
+            {t("dashboard.export")}
           </button>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-3">
           {budgetGroups.length === 0 ? (
             <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
-              No monthly budget set
+              {t("dashboard.noMonthlyBudgetSet")}
             </div>
           ) : budgetGroups.map((segment) => (
             <div
@@ -150,7 +159,7 @@ const ExpenseRank = ({ summary, isLoading }) => {
               className="flex items-center gap-2 text-xs font-medium text-slate-600"
             >
               <span className={`size-2.5 rounded-full ${groupStyles[segment.groupName]?.dot || "bg-slate-300"}`} />
-              {segment.groupName}
+              {t(`dashboard.${segment.groupName.toLowerCase()}`)}
             </div>
           ))}
         </div>
@@ -191,7 +200,7 @@ const ExpenseRank = ({ summary, isLoading }) => {
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
               <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">
-                Remaining
+                {t("dashboard.remaining")}
               </p>
               <p className="mt-1 text-xl font-bold text-slate-900">
                 {formatMoney(remaining)}
@@ -205,13 +214,13 @@ const ExpenseRank = ({ summary, isLoading }) => {
             type="button"
             className="text-xs font-medium text-slate-500 hover:text-slate-900"
           >
-            This month
+            {t("dashboard.thisMonth")}
           </button>
           <button
             type="button"
             className="text-xs font-semibold text-blue-700 hover:text-blue-800"
           >
-            Budget details
+            {t("dashboard.budgetDetails")}
           </button>
         </div>
       </div>

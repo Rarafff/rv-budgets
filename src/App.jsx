@@ -2,9 +2,12 @@ import { useState } from "react";
 import Sidebar from "./components/sidebar";
 import { Outlet } from "react-router-dom";
 import logo from "./assets/logo.svg";
+import LanguageToggle from "./components/language-toggle";
+import { useTranslation } from "./i18n/use-translation";
 
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="relative h-[100svh] overflow-hidden bg-gradient-to-br from-sky-50 via-white to-fuchsia-50 text-slate-900 md:flex">
@@ -21,14 +24,17 @@ const App = () => {
           />
           <div className="text-lg font-semibold tracking-tight">Budgets.</div>
         </div>
-        <button
-          type="button"
-          className="rounded-lg p-2 text-blue-700 hover:bg-blue-50"
-          onClick={() => setSidebarOpen(true)}
-          aria-label="Open menu"
-        >
-          ☰
-        </button>
+        <div className="flex items-center gap-2">
+          <LanguageToggle className="hidden min-[420px]:flex" />
+          <button
+            type="button"
+            className="rounded-lg p-2 text-blue-700 hover:bg-blue-50"
+            onClick={() => setSidebarOpen(true)}
+            aria-label={t("app.openMenu")}
+          >
+            {t("app.openMenu")}
+          </button>
+        </div>
       </div>
 
       {sidebarOpen && (

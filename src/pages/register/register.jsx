@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { register } from "../../api/auth";
 import { saveAuth } from "../../utils/auth";
 import logo from "../../assets/logo.svg";
+import LanguageToggle from "../../components/language-toggle";
+import { useTranslation } from "../../i18n/use-translation";
 
 const UserIcon = () => (
   <svg
@@ -69,6 +71,7 @@ const LockIcon = () => (
 
 const Register = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -100,14 +103,14 @@ const Register = () => {
         user: response.data?.user,
         rememberMe: form.rememberMe,
       });
-      setMessage("Account created. Redirecting...");
+      setMessage(t("auth.accountCreated"));
       setTimeout(() => navigate("/onboarding"), 700);
     } catch (requestError) {
       setError(
         requestError.response?.data?.error ||
           requestError.response?.data?.message ||
           requestError.message ||
-          "Registration failed. Please try again.",
+          t("auth.registrationFailed"),
       );
     } finally {
       setIsSubmitting(false);
@@ -118,16 +121,19 @@ const Register = () => {
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10 text-slate-900">
       <div className="w-full max-w-xl">
         <div className="text-center">
+          <div className="mb-5 flex justify-center">
+            <LanguageToggle />
+          </div>
           <img
             src={logo}
             alt="Budgets logo"
             className="mx-auto size-20 rounded-3xl object-cover"
           />
           <h1 className="mt-6 text-4xl font-black tracking-tight">
-            Create Account
+            {t("auth.createAccount")}
           </h1>
           <p className="mt-4 text-xl font-medium text-slate-500">
-            Start managing your personal finances.
+            {t("auth.registerSubtitle")}
           </p>
         </div>
 
@@ -139,7 +145,7 @@ const Register = () => {
             <UserIcon />
             <input
               type="text"
-              placeholder="Full Name"
+              placeholder={t("auth.fullName")}
               value={form.name}
               onChange={updateField("name")}
               className="min-w-0 flex-1 bg-transparent text-xl font-semibold text-slate-900 outline-none placeholder:text-slate-400"
@@ -159,14 +165,14 @@ const Register = () => {
               }
               className="size-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
             />
-            Remember me
+            {t("auth.rememberMe")}
           </label>
 
           <label className="mt-5 flex h-20 items-center gap-5 rounded-2xl bg-slate-50 px-5 text-slate-400 focus-within:ring-2 focus-within:ring-blue-200">
             <MailIcon />
             <input
               type="email"
-              placeholder="Email Address"
+              placeholder={t("auth.email")}
               value={form.email}
               onChange={updateField("email")}
               className="min-w-0 flex-1 bg-transparent text-xl font-semibold text-slate-900 outline-none placeholder:text-slate-400"
@@ -178,7 +184,7 @@ const Register = () => {
             <PhoneIcon />
             <input
               type="tel"
-              placeholder="Phone Number"
+              placeholder={t("auth.phoneNumber")}
               value={form.phoneNumber}
               onChange={updateField("phoneNumber")}
               className="min-w-0 flex-1 bg-transparent text-xl font-semibold text-slate-900 outline-none placeholder:text-slate-400"
@@ -190,7 +196,7 @@ const Register = () => {
             <LockIcon />
             <input
               type="password"
-              placeholder="Create Password"
+              placeholder={t("auth.createPassword")}
               value={form.password}
               onChange={updateField("password")}
               className="min-w-0 flex-1 bg-transparent text-xl font-semibold text-slate-900 outline-none placeholder:text-slate-400"
@@ -215,22 +221,21 @@ const Register = () => {
             disabled={isSubmitting}
             className="mt-7 h-16 w-full rounded-2xl bg-blue-600 text-xl font-black text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
           >
-            {isSubmitting ? "Registering..." : "Register"}
+            {isSubmitting ? t("auth.registering") : t("auth.register")}
           </button>
 
           <div className="mt-8 border-t border-slate-100 pt-8 text-center">
             <p className="text-lg font-bold text-slate-500">
-              Already have an account?{" "}
+              {t("auth.haveAccount")}{" "}
               <Link to="/login" className="hover:text-blue-700">
-                Login
+                {t("auth.login")}
               </Link>
             </p>
           </div>
         </form>
 
         <p className="mx-auto mt-8 max-w-md text-center text-sm font-medium leading-6 text-slate-400">
-          By registering, you agree to Budgets&apos; Terms & Conditions and
-          Privacy Policy.
+          {t("auth.terms")}
         </p>
       </div>
     </main>

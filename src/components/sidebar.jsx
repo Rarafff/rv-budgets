@@ -1,9 +1,12 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { clearAuth } from "../utils/auth";
 import logo from "../assets/logo.svg";
+import LanguageToggle from "./language-toggle";
+import { useTranslation } from "../i18n/use-translation";
 
 const Sidebar = ({ className = "", onClose }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const linkClass = ({ isActive }) =>
     `block rounded-xl px-3 py-2 ${
@@ -33,62 +36,64 @@ const Sidebar = ({ className = "", onClose }) => {
           type="button"
           className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 md:hidden"
           onClick={onClose}
-          aria-label="Close menu"
+          aria-label={t("app.closeMenu")}
         >
           ✕
         </button>
       </div>
 
+      <LanguageToggle className="mt-5 justify-between" />
+
       <nav className="mt-6 flex-1 min-h-0 overflow-y-auto">
         <ul className="space-y-1 text-sm font-medium text-slate-700">
           <li>
             <NavLink to="/" end className={linkClass} onClick={onClose}>
-              Home
+              {t("nav.home")}
             </NavLink>
           </li>
           <li>
             <NavLink to="/wallet" className={linkClass} onClick={onClose}>
-              Wallet
+              {t("nav.wallet")}
             </NavLink>
           </li>
           <li>
             <NavLink to="/transactions" className={linkClass} onClick={onClose}>
-              Transactions
+              {t("nav.transactions")}
             </NavLink>
           </li>
           <li>
             <NavLink to="/budget" className={linkClass} onClick={onClose}>
-              Budget
+              {t("nav.budget")}
             </NavLink>
           </li>
           <li>
             <NavLink to="/goals" className={linkClass} onClick={onClose}>
-              Goals
+              {t("nav.goals")}
             </NavLink>
           </li>
           <li>
             <NavLink to="/assets" className={linkClass} onClick={onClose}>
-              Asset
+              {t("nav.asset")}
             </NavLink>
           </li>
           <li>
             <NavLink to="/couple" className={linkClass} onClick={onClose}>
-              Couple
+              {t("nav.couple")}
             </NavLink>
           </li>
           <li>
             <NavLink to="/advisor" className={linkClass} onClick={onClose}>
-              AI Advisor
+              {t("nav.advisor")}
             </NavLink>
           </li>
           <li>
             <NavLink to="/report" className={linkClass} onClick={onClose}>
-              Report
+              {t("nav.report")}
             </NavLink>
           </li>
           <li>
             <NavLink to="/profile" className={linkClass} onClick={onClose}>
-              Profile
+              {t("nav.profile")}
             </NavLink>
           </li>
         </ul>
@@ -97,14 +102,16 @@ const Sidebar = ({ className = "", onClose }) => {
       <div className="mt-auto border-t border-slate-200 pt-4">
         <ul className="space-y-1 text-sm font-medium text-slate-600">
           <li className="rounded-xl px-3 py-2 hover:bg-slate-100">
-            What's New
+            {t("nav.whatsNew")}
           </li>
-          <li className="rounded-xl px-3 py-2 hover:bg-slate-100">Dark Mode</li>
+          <li className="rounded-xl px-3 py-2 hover:bg-slate-100">
+            {t("nav.darkMode")}
+          </li>
           <li
             className="rounded-xl px-3 py-2 text-rose-600 hover:bg-rose-50"
             onClick={handleLogout}
           >
-            Logout
+            {t("nav.logout")}
           </li>
         </ul>
       </div>

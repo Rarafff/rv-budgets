@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { createBill, deleteBill, payBill, updateBill } from "../../api/bill";
-import { getBudgets } from "../../api/budget";
 import { getWallets } from "../../api/wallet";
+import { useTranslation } from "../../i18n/use-translation";
 
 const billIcons = {
   card: (
@@ -25,8 +25,6 @@ const billIcons = {
 };
 
 const today = () => new Date().toISOString().slice(0, 10);
-const periodFromDate = (date) => (date || today()).slice(0, 7);
-
 const formatMoney = (amount) =>
   new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -34,8 +32,8 @@ const formatMoney = (amount) =>
     maximumFractionDigits: 0,
   }).format(Number(amount || 0));
 
-const formatDate = (date) =>
-  new Intl.DateTimeFormat("en-US", {
+const formatDate = (date, language) =>
+  new Intl.DateTimeFormat(language === "id" ? "id-ID" : "en-US", {
     month: "short",
     day: "numeric",
   }).format(new Date(date));
@@ -53,20 +51,18 @@ const emptyForm = {
 };
 
 const IncomingBill = ({ summary, isLoading, onChanged }) => {
+  const { language, t } = useTranslation();
   const incomingBills = summary?.incomingBills || [];
   const [showModal, setShowModal] = useState(false);
   const [editingBill, setEditingBill] = useState(null);
   const [wallets, setWallets] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [isLoadingChoices, setIsLoadingChoices] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const periodMonth = useMemo(() => periodFromDate(form.dueDate), [form.dueDate]);
   const hasWallets = wallets.length > 0;
-  const hasCategories = categories.length > 0;
-  const isMissingSetup = !hasWallets || !hasCategories;
+  const isMissingSetup = !hasWallets;
 
   useEffect(() => {
     if (!showModal) return;
@@ -74,22 +70,13 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
     const loadChoices = async () => {
       setIsLoadingChoices(true);
       try {
-        const [walletResponse, budgetResponse] = await Promise.all([
-          getWallets(),
-          getBudgets(periodMonth),
-        ]);
+        const walletResponse = await getWallets();
         const walletItems = walletResponse.data || [];
-        const budgetItems = budgetResponse.data || [];
-        const categoryItems = [...new Set(budgetItems.map((item) => item.category))];
 
         setWallets(walletItems);
-        setCategories(categoryItems);
         setForm((current) => ({
           ...current,
           walletId: current.walletId || walletItems[0]?.id || "",
-          category: categoryItems.includes(current.category)
-            ? current.category
-            : categoryItems[0] || "",
         }));
       } catch (requestError) {
         setError(
@@ -104,7 +91,7 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
     };
 
     loadChoices();
-  }, [showModal, periodMonth]);
+  }, [showModal]);
 
   const updateForm = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
@@ -225,13 +212,15 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
         <span className="inline-flex size-8 items-center justify-center rounded-full bg-blue-100 text-blue-700">
           {billIcons.card}
         </span>
-        <h2 className="text-base font-bold text-slate-900">Incoming Bills</h2>
+        <h2 className="text-base font-bold text-slate-900">
+          {t("dashboard.incomingBills")}
+        </h2>
         <button
           type="button"
           onClick={openCreateModal}
           className="ml-auto rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700"
         >
-          Add
+          {t("dashboard.add")}
         </button>
       </div>
 
@@ -244,11 +233,11 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
       <div className="bills-container mt-4 min-h-0 w-full flex-1 divide-y divide-slate-100 overflow-y-auto pr-1">
         {isLoading ? (
           <p className="py-6 text-center text-sm font-semibold text-slate-500">
-            Loading bills...
+            {t("dashboard.loadingBills")}
           </p>
         ) : incomingBills.length === 0 ? (
           <p className="py-6 text-center text-sm font-semibold text-slate-500">
-            No incoming bills yet.
+            {t("dashboard.noIncomingBills")}
           </p>
         ) : (
           incomingBills.map((bill) => (
@@ -261,17 +250,20 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
                   <p className="truncate text-sm font-bold">{bill.name}</p>
                   {bill.status === "overdue" && (
                     <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold uppercase text-rose-600">
-                      Overdue
+                      {t("dashboard.overdue")}
                     </span>
                   )}
                   {bill.isRecurring && (
                     <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold uppercase text-blue-700">
-                      Monthly
+                      {t("dashboard.monthly")}
                     </span>
                   )}
                 </div>
                 <p className="truncate text-xs font-semibold text-slate-500">
-                  {(bill.provider || bill.category) || "Bill"} - due by {formatDate(bill.dueDate)}
+                  {(bill.provider || bill.category) || t("dashboard.bill")} -{" "}
+                  {t("dashboard.dueBy", {
+                    date: formatDate(bill.dueDate, language),
+                  })}
                 </p>
               </div>
               <div className="ml-auto flex shrink-0 items-center gap-2">
@@ -284,7 +276,7 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
                   onClick={() => handlePay(bill)}
                   className="rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Pay
+                  {t("dashboard.pay")}
                 </button>
                 <button
                   type="button"
@@ -292,7 +284,7 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
                   onClick={() => openEditModal(bill)}
                   className="rounded-lg bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-600 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Edit
+                  {t("common.edit")}
                 </button>
                 <button
                   type="button"
@@ -300,7 +292,7 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
                   onClick={() => handleDelete(bill)}
                   className="rounded-lg bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-600 hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Delete
+                  {t("common.delete")}
                 </button>
               </div>
             </div>
@@ -316,20 +308,20 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
           >
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-slate-900">
-                {editingBill ? "Edit Bill" : "Add Bill"}
+                {editingBill ? t("dashboard.editBill") : t("dashboard.addBill")}
               </h3>
               <button
                 type="button"
                 onClick={closeModal}
                 className="rounded-lg px-2 py-1 text-sm font-bold text-slate-500 hover:bg-slate-100"
               >
-                Close
+                {t("dashboard.close")}
               </button>
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <label className="text-sm font-bold text-slate-600">
-                Name
+                {t("common.name")}
                 <input
                   value={form.name}
                   onChange={(event) => updateForm("name", event.target.value)}
@@ -339,7 +331,7 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
                 />
               </label>
               <label className="text-sm font-bold text-slate-600">
-                Provider
+                {t("dashboard.provider")}
                 <input
                   value={form.provider}
                   onChange={(event) => updateForm("provider", event.target.value)}
@@ -348,7 +340,7 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
                 />
               </label>
               <label className="text-sm font-bold text-slate-600">
-                Amount
+                {t("common.amount")}
                 <input
                   type="number"
                   min="1"
@@ -360,7 +352,7 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
                 />
               </label>
               <label className="text-sm font-bold text-slate-600">
-                Due Date
+                {t("common.dueDate")}
                 <input
                   type="date"
                   value={form.dueDate}
@@ -370,7 +362,7 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
                 />
               </label>
               <label className="text-sm font-bold text-slate-600">
-                Wallet
+                {t("common.wallet")}
                 <select
                   value={form.walletId}
                   onChange={(event) => updateForm("walletId", event.target.value)}
@@ -378,7 +370,7 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
                   disabled={!hasWallets}
                   className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900"
                 >
-                  <option value="">Select wallet...</option>
+                  <option value="">{t("common.selectWallet")}</option>
                   {wallets.map((wallet) => (
                     <option key={wallet.id} value={wallet.id}>
                       {wallet.name}
@@ -387,31 +379,24 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
                 </select>
               </label>
               <label className="text-sm font-bold text-slate-600">
-                Budget Category
-                <select
+                {t("dashboard.budgetCategory")}
+                <input
                   value={form.category}
                   onChange={(event) => updateForm("category", event.target.value)}
                   required
-                  disabled={!hasCategories}
                   className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900"
-                >
-                  <option value="">Select category...</option>
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
+                  placeholder="Electricity, Internet, Rent"
+                />
               </label>
             </div>
 
             <label className="mt-3 block text-sm font-bold text-slate-600">
-              Note
+              {t("common.note")}
               <textarea
                 value={form.note}
                 onChange={(event) => updateForm("note", event.target.value)}
                 className="mt-1 min-h-20 w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900"
-                placeholder="Optional"
+                placeholder={t("common.optional")}
               />
             </label>
 
@@ -422,7 +407,7 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
                 onChange={(event) => updateForm("isRecurring", event.target.checked)}
                 className="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
               />
-              Repeat monthly after payment
+              {t("dashboard.repeatMonthly")}
             </label>
 
             {!isLoadingChoices && isMissingSetup && (
@@ -432,14 +417,6 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
                     <span>Create a wallet before adding a bill.</span>
                     <Link to="/wallet" className="shrink-0 text-blue-700 hover:underline">
                       Go to Wallet
-                    </Link>
-                  </div>
-                )}
-                {!hasCategories && (
-                  <div className="flex items-center justify-between gap-3 rounded-lg bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700">
-                    <span>Create a budget category for {periodMonth} first.</span>
-                    <Link to="/budget" className="shrink-0 text-blue-700 hover:underline">
-                      Go to Budget
                     </Link>
                   </div>
                 )}
@@ -454,10 +431,10 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
               {isSaving
                 ? "Saving..."
                 : isLoadingChoices
-                  ? "Loading setup..."
+                  ? t("dashboard.loadingSetup")
                   : editingBill
-                    ? "Save Changes"
-                    : "Save Bill"}
+                    ? t("common.saveChanges")
+                    : t("dashboard.saveBill")}
             </button>
           </form>
         </div>
