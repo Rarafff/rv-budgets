@@ -8,15 +8,12 @@ import {
   updateTransaction,
 } from "../../api/transaction";
 import { getWallets } from "../../api/wallet";
-import { getBudgets } from "../../api/budget";
 
 const transactionTypes = [
   { id: "expense", label: "Expense", icon: "↗" },
   { id: "income", label: "Income", icon: "↙" },
   { id: "transfer", label: "Transfer", icon: "↔" },
 ];
-
-const incomeCategories = ["Salary", "Bonus", "Investment", "Gift", "Other"];
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -187,7 +184,6 @@ const TransactionRow = ({
 const TransactionModal = ({
   form,
   wallets,
-  budgetCategories,
   editingTransaction,
   isSaving,
   onChange,
@@ -198,8 +194,6 @@ const TransactionModal = ({
   const activeType = transactionTypes.find((item) => item.id === form.type);
   const isTransfer = form.type === "transfer";
   const walletLabel = form.type === "income" ? "To Wallet" : "From Wallet";
-  const categoryOptions =
-    form.type === "expense" ? budgetCategories : incomeCategories;
 
   return (
     <div
@@ -338,28 +332,13 @@ const TransactionModal = ({
               <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
                 Category
               </span>
-              <select
+              <input
                 className={inputClass}
                 value={form.category}
                 onChange={onChange("category")}
                 required={form.type === "expense"}
-              >
-                <option value="">
-                  {form.type === "expense"
-                    ? "Select budget category..."
-                    : "Select category..."}
-                </option>
-                {categoryOptions.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-              {form.type === "expense" && budgetCategories.length === 0 && (
-                <p className="mt-2 text-xs font-semibold text-rose-500">
-                  Create a budget for this transaction month first.
-                </p>
-              )}
+                placeholder="e.g. Food, Transport, Salary"
+              />
             </label>
           )}
 
@@ -408,26 +387,15 @@ const TransactionModal = ({
 const BulkTransactionModal = ({
   rows,
   wallets,
-  budgetCategoriesByMonth,
   isSaving,
   onRowsChange,
-  onLoadBudgetCategories,
   onClose,
   onSubmit,
 }) => {
   const updateRow = (id, field, value) => {
-    if (field === "transactionDate") {
-      onLoadBudgetCategories(value.slice(0, 7));
-    }
     onRowsChange((current) =>
       current.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
     );
-  };
-
-  const rowCategories = (row) => {
-    if (row.type === "income") return incomeCategories;
-    const periodMonth = row.transactionDate?.slice(0, 7) || today().slice(0, 7);
-    return budgetCategoriesByMonth[periodMonth] || [];
   };
 
   const addRow = () => {
@@ -555,20 +523,14 @@ const BulkTransactionModal = ({
                     </select>
                   </td>
                   <td className="px-3 py-3">
-                    <select
+                    <input
                       className="w-36 rounded-lg border border-transparent bg-transparent px-2 py-2 text-sm outline-none focus:border-blue-200 focus:bg-white"
                       value={row.category}
                       onChange={(event) =>
                         updateRow(row.id, "category", event.target.value)
                       }
-                    >
-                      <option value="">Select...</option>
-                      {rowCategories(row).map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder="Category"
+                    />
                   </td>
                   <td className="px-3 py-3">
                     <input
@@ -612,7 +574,6 @@ const Transaction = () => {
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState([]);
   const [wallets, setWallets] = useState([]);
-  const [budgetCategoriesByMonth, setBudgetCategoriesByMonth] = useState({});
   const [openTransaction, setOpenTransaction] = useState(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
@@ -640,7 +601,6 @@ const Transaction = () => {
       ]);
       setWallets(walletResponse.data || []);
       setTransactions(transactionResponse.data || []);
-      await loadBudgetCategories(today().slice(0, 7));
     } catch (requestError) {
       setError(
         requestError.response?.data?.error ||
@@ -673,19 +633,7 @@ const Transaction = () => {
 
   const defaultWalletID = () => wallets[0]?.id || "";
 
-  const loadBudgetCategories = async (periodMonth) => {
-    if (!periodMonth || budgetCategoriesByMonth[periodMonth]) return;
-
-    const response = await getBudgets(periodMonth);
-    const categories = [...new Set((response.data || []).map((budget) => budget.category))];
-    setBudgetCategoriesByMonth((current) => ({
-      ...current,
-      [periodMonth]: categories,
-    }));
-  };
-
   const openCreateModal = (type = "expense") => {
-    loadBudgetCategories(today().slice(0, 7));
     setEditingTransaction(null);
     setForm({
       ...emptyForm,
@@ -697,7 +645,6 @@ const Transaction = () => {
   };
 
   const openEditModal = (transaction) => {
-    loadBudgetCategories((transaction.transactionDate || today()).slice(0, 7));
     setEditingTransaction(transaction);
     setForm({
       walletId: transaction.walletId || "",
@@ -719,9 +666,6 @@ const Transaction = () => {
   };
 
   const updateForm = (field) => (event) => {
-    if (field === "transactionDate") {
-      loadBudgetCategories(event.target.value.slice(0, 7));
-    }
     setForm((current) => ({
       ...current,
       [field]: event.target.value,
@@ -812,7 +756,6 @@ const Transaction = () => {
   };
 
   const openBulkModal = () => {
-    loadBudgetCategories(today().slice(0, 7));
     setBulkRows([
       {
         id: "bulk-1",
@@ -973,9 +916,6 @@ const Transaction = () => {
         <TransactionModal
           form={form}
           wallets={wallets}
-          budgetCategories={
-            budgetCategoriesByMonth[form.transactionDate.slice(0, 7)] || []
-          }
           editingTransaction={editingTransaction}
           isSaving={isSaving}
           onChange={updateForm}
@@ -989,10 +929,8 @@ const Transaction = () => {
         <BulkTransactionModal
           rows={bulkRows}
           wallets={wallets}
-          budgetCategoriesByMonth={budgetCategoriesByMonth}
           isSaving={isSaving}
           onRowsChange={setBulkRows}
-          onLoadBudgetCategories={loadBudgetCategories}
           onClose={() => setShowBulkModal(false)}
           onSubmit={handleBulkSubmit}
         />

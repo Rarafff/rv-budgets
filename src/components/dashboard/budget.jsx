@@ -1,9 +1,11 @@
 import React from "react";
+import { useTranslation } from "../../i18n/use-translation";
 
 const formatMoney = (amount) =>
   `Rp. ${Number(amount || 0).toLocaleString("id-ID")}`;
 
 const Budget = ({ summary, isLoading }) => {
+  const { t } = useTranslation();
   const income = summary?.monthlyIncome || 0;
   const expense = summary?.monthlyExpense || 0;
   const budgetLimit = summary?.budgetLimit || 0;
@@ -30,14 +32,16 @@ const Budget = ({ summary, isLoading }) => {
                 isOverBudget ? "text-rose-700" : "text-blue-700"
               }`}
             >
-              {isOverBudget ? "Over Budget By" : "Remaining Budget Left"}
+              {isOverBudget
+                ? t("dashboard.overBudgetByLabel")
+                : t("dashboard.remainingBudgetLeft")}
             </p>
             <p className="text-3xl font-semibold tracking-tight md:text-4xl">
               {isLoading
-                ? "Loading..."
+                ? t("dashboard.loading")
                 : hasBudget
                   ? formatMoney(isOverBudget ? overSpent : remaining)
-                  : "No budget set"}
+                  : t("dashboard.noBudgetSet")}
             </p>
           </div>
 
@@ -56,9 +60,15 @@ const Budget = ({ summary, isLoading }) => {
               <em>
                 {hasBudget
                   ? isOverBudget
-                    ? `${formatMoney(budgetSpent)} used from ${formatMoney(budgetLimit)} monthly budget`
-                    : `${formatMoney(budgetSpent)} used from ${formatMoney(budgetLimit)} monthly budget`
-                  : "Create budgets to track remaining monthly allocation"}
+                    ? t("dashboard.usedFromBudget", {
+                        spent: formatMoney(budgetSpent),
+                        limit: formatMoney(budgetLimit),
+                      })
+                    : t("dashboard.usedFromBudget", {
+                        spent: formatMoney(budgetSpent),
+                        limit: formatMoney(budgetLimit),
+                      })
+                  : t("dashboard.createBudgetHint")}
               </em>
             </p>
           </div>
@@ -67,25 +77,33 @@ const Budget = ({ summary, isLoading }) => {
 
       <div className="income-budget flex min-h-32 flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <div>
-          <p className="text-sm font-medium text-slate-500">Income</p>
+          <p className="text-sm font-medium text-slate-500">
+            {t("dashboard.income")}
+          </p>
           <p className="mt-2 text-2xl font-semibold text-slate-900">
-            {isLoading ? "Loading..." : formatMoney(income)}
+            {isLoading ? t("dashboard.loading") : formatMoney(income)}
           </p>
         </div>
         <p className="w-fit rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700">
-          +4% from last month
+          {t("dashboard.fromLastMonth")}
         </p>
       </div>
 
       <div className="expense-budget flex min-h-32 flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <div>
-          <p className="text-sm font-medium text-slate-500">Expense</p>
+          <p className="text-sm font-medium text-slate-500">
+            {t("dashboard.expense")}
+          </p>
           <p className="mt-2 text-2xl font-semibold text-slate-900">
-            {isLoading ? "Loading..." : formatMoney(expense)}
+            {isLoading ? t("dashboard.loading") : formatMoney(expense)}
           </p>
         </div>
         <p className="w-fit rounded-full bg-rose-100 px-2.5 py-1 text-xs font-medium text-rose-700">
-          {income > 0 ? `${Math.round((expense / income) * 100)}% of income` : "No income yet"}
+          {income > 0
+            ? t("dashboard.ofIncome", {
+                percent: Math.round((expense / income) * 100),
+              })
+            : t("dashboard.noIncomeYet")}
         </p>
       </div>
     </div>

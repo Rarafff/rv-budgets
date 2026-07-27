@@ -11,6 +11,7 @@ const groups = ["Needs", "Wants"];
 const emptyForm = {
   groupName: "Needs",
   category: "",
+  transactionCategory: "",
   periodMonth: new Date().toISOString().slice(0, 7),
   limitAmount: "",
   icon: "",
@@ -47,6 +48,9 @@ const BudgetItem = ({ item, onEdit, onDelete }) => {
             <div className="min-w-0">
               <p className="truncate text-sm font-bold text-slate-900">
                 {item.category}
+              </p>
+              <p className="mt-0.5 truncate text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                Tracks: {item.transactionCategory || item.category}
               </p>
             </div>
             <p className="whitespace-nowrap text-sm font-bold text-slate-900">
@@ -159,15 +163,30 @@ const BudgetModal = ({
 
         <label className="block">
           <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
-            Category
+            Budget Name
           </span>
           <input
             className={inputClass}
-            placeholder="e.g. Food"
+            placeholder="e.g. Monthly Food Limit"
             value={form.category}
             onChange={onChange("category")}
             required
           />
+        </label>
+
+        <label className="block">
+          <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
+            Transaction Category
+          </span>
+          <input
+            className={inputClass}
+            placeholder="e.g. Food"
+            value={form.transactionCategory}
+            onChange={onChange("transactionCategory")}
+          />
+          <p className="mt-2 text-xs font-semibold text-slate-400">
+            Transactions with this category will count toward this budget.
+          </p>
         </label>
 
         <div className="grid gap-4 sm:grid-cols-[1fr_5rem]">
@@ -338,6 +357,7 @@ const Budget = () => {
     setForm({
       groupName: normalizeGroupName(budget.groupName),
       category: budget.category,
+      transactionCategory: budget.transactionCategory || budget.category,
       periodMonth: budget.periodMonth,
       limitAmount: String(budget.limitAmount || ""),
       icon: budget.icon || "",
@@ -354,6 +374,7 @@ const Budget = () => {
   const payload = () => ({
     groupName: form.groupName,
     category: form.category,
+    transactionCategory: form.transactionCategory || form.category,
     periodMonth: form.periodMonth,
     limitAmount: Number(form.limitAmount || 0),
     icon: form.icon,

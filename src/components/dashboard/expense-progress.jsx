@@ -1,4 +1,7 @@
+import { useTranslation } from "../../i18n/use-translation";
+
 const ExpenseProgress = ({ summary }) => {
+  const { t } = useTranslation();
   const budgetGroups = summary?.budgetByGroup || [];
   const budgetPercent = summary?.budgetLimit > 0
     ? Math.min(Math.round(summary?.budgetUsedPercent || 0), 100)
@@ -45,22 +48,24 @@ const ExpenseProgress = ({ summary }) => {
 
         <div className="absolute inset-0 flex items-center justify-center text-center">
           <span className="text-sm font-bold text-slate-500">
-            Day {currentDay}
+            {t("dashboard.day", { day: currentDay })}
           </span>
         </div>
       </div>
 
       <div className="expense-progress-title text-center lg:w-44 lg:text-left">
-        <p className="text-lg font-bold text-slate-700">Budget Progress</p>
+        <p className="text-lg font-bold text-slate-700">
+          {t("dashboard.budgetProgress")}
+        </p>
         <p className="text-xs font-bold text-slate-500">
-          Day {currentDay} from {totalDays}
+          {t("dashboard.dayFrom", { day: currentDay, total: totalDays })}
         </p>
       </div>
 
       <div className="needs-wants-save w-full space-y-3">
         {budgetGroups.length === 0 ? (
           <p className="rounded-xl bg-slate-50 p-4 text-sm font-bold text-slate-500">
-            No monthly budget set.
+            {t("dashboard.noMonthlyBudget")}
           </p>
         ) : (
           budgetGroups.map((group) => {
@@ -70,7 +75,7 @@ const ExpenseProgress = ({ summary }) => {
               <div key={group.groupName}>
                 <div className="mb-1 flex justify-between">
                   <span className="text-sm font-medium text-slate-700">
-                    {group.groupName.toUpperCase()}
+                    {t(`dashboard.${group.groupName.toLowerCase()}`)}
                   </span>
                   <span className={`text-sm font-medium ${isOver ? "text-rose-600" : "text-slate-700"}`}>
                     {percent}%

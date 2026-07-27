@@ -1,6 +1,7 @@
 import React from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import { useTranslation } from "../../i18n/use-translation";
 
 const formatMoney = (amount) =>
   `Rp. ${Number(amount || 0).toLocaleString("id-ID")}`;
@@ -13,6 +14,7 @@ const signedAmount = (transaction) => {
 };
 
 const CalendarActivites = ({ summary, isLoading }) => {
+  const { t } = useTranslation();
   const transactions = summary?.recentTransactions || [];
   const events = (summary?.calendarEvents || []).map((event) => ({
     title: `${event.type === "income" ? "+" : event.type === "expense" ? "-" : ""}${Number(
@@ -27,7 +29,7 @@ const CalendarActivites = ({ summary, isLoading }) => {
   return (
     <div className="activities-transaction-container mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(340px,0.75fr)] lg:items-stretch">
       <div className="month-activities calendar-compact flex min-h-[32rem] w-full flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:min-h-[36rem]">
-        <p className="text-lg font-bold">This Month Activities</p>
+        <p className="text-lg font-bold">{t("dashboard.thisMonthActivities")}</p>
         <div className="mt-4 min-h-0 flex-1">
           <FullCalendar
             plugins={[dayGridPlugin]}
@@ -69,19 +71,19 @@ const CalendarActivites = ({ summary, isLoading }) => {
       </div>
       <div className="new-transactions flex max-h-[36rem] w-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div className="flex items-center justify-between gap-4">
-          <p className="text-lg font-bold">New Transactions</p>
+          <p className="text-lg font-bold">{t("dashboard.newTransactions")}</p>
           <p className="text-xs font-medium text-slate-500">
-            {transactions.length} items
+            {t("dashboard.items", { count: transactions.length })}
           </p>
         </div>
         <div className="mt-4 min-h-0 flex-1 overflow-y-auto pr-1">
           {isLoading ? (
             <p className="rounded-xl bg-slate-50 px-3 py-3 text-sm font-bold text-slate-500">
-              Loading transactions...
+              {t("dashboard.loadingTransactions")}
             </p>
           ) : transactions.length === 0 ? (
             <p className="rounded-xl bg-slate-50 px-3 py-3 text-sm font-bold text-slate-500">
-              No recent transactions.
+              {t("dashboard.noRecentTransactions")}
             </p>
           ) : (
             transactions.map((tx) => (

@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createTransaction } from "../../api/transaction";
 import { getWallets } from "../../api/wallet";
 import { parseReceipt } from "../../api/receipt";
-import { getBudgets } from "../../api/budget";
 
 const inputClass =
   "mt-2 h-11 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:border-blue-300 focus:bg-white";
@@ -16,17 +15,8 @@ const formatMoney = (amount, currency = "IDR") =>
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-const formatMonth = (periodMonth) => {
-  const [year, month] = periodMonth.split("-");
-  return new Intl.DateTimeFormat("id-ID", {
-    month: "long",
-    year: "numeric",
-  }).format(new Date(Number(year), Number(month) - 1, 1));
-};
-
 const ReceiptScanner = () => {
   const [wallets, setWallets] = useState([]);
-  const [budgetCategoriesByMonth, setBudgetCategoriesByMonth] = useState({});
   const [file, setFile] = useState(null);
   const [previewURL, setPreviewURL] = useState("");
   const [parseResult, setParseResult] = useState(null);
@@ -47,17 +37,9 @@ const ReceiptScanner = () => {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const [walletResponse, budgetResponse] = await Promise.all([
-          getWallets(),
-          getBudgets(today().slice(0, 7)),
-        ]);
+        const walletResponse = await getWallets();
         const loadedWallets = walletResponse.data || [];
         setWallets(loadedWallets);
-        setBudgetCategoriesByMonth({
-          [today().slice(0, 7)]: [
-            ...new Set((budgetResponse.data || []).map((budget) => budget.category)),
-          ],
-        });
         setForm((current) => ({
           ...current,
           walletId: current.walletId || loadedWallets[0]?.id || "",
@@ -97,34 +79,9 @@ const ReceiptScanner = () => {
   );
 
   const updateField = (field) => (event) => {
-    if (field === "transactionDate") {
-      loadBudgetCategories(event.target.value.slice(0, 7));
-    }
     setForm((current) => ({
       ...current,
       [field]: event.target.value,
-    }));
-  };
-
-  const useCurrentMonthDate = () => {
-    const value = today();
-    loadBudgetCategories(value.slice(0, 7));
-    setForm((current) => ({
-      ...current,
-      transactionDate: value,
-      category: "",
-    }));
-  };
-
-  const loadBudgetCategories = async (periodMonth) => {
-    if (!periodMonth || budgetCategoriesByMonth[periodMonth]) return;
-
-    const response = await getBudgets(periodMonth);
-    setBudgetCategoriesByMonth((current) => ({
-      ...current,
-      [periodMonth]: [
-        ...new Set((response.data || []).map((budget) => budget.category)),
-      ],
     }));
   };
 
@@ -159,8 +116,8 @@ const ReceiptScanner = () => {
         note: suggested.note || `Receipt scan${result.merchant ? `: ${result.merchant}` : ""}`,
         amount: String(suggested.amount || result.total || ""),
         transactionDate: suggested.transactionDate || result.date || today(),
+        category: suggested.category || result.category || current.category,
       }));
-      loadBudgetCategories((suggested.transactionDate || result.date || today()).slice(0, 7));
       setMessage("Receipt parsed. Review before saving.");
     } catch (requestError) {
       setError(
@@ -192,10 +149,6 @@ const ReceiptScanner = () => {
       amount: String(selectedTotal),
     }));
   };
-
-  const activeBudgetCategories =
-    budgetCategoriesByMonth[form.transactionDate.slice(0, 7)] || [];
-  const activePeriodMonth = form.transactionDate.slice(0, 7);
 
   const handleSave = async () => {
     setError("");
@@ -378,32 +331,12 @@ const ReceiptScanner = () => {
                 <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
                   Category
                 </span>
-                <select
+                <input
                   className={inputClass}
                   value={form.category}
                   onChange={updateField("category")}
-                >
-                  <option value="">Select budget category...</option>
-                  {activeBudgetCategories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-                {activeBudgetCategories.length === 0 && (
-                  <div className="mt-2 rounded-xl bg-rose-50 p-3">
-                    <p className="text-xs font-semibold text-rose-600">
-                      No budget categories found for {formatMonth(activePeriodMonth)}.
-                    </p>
-                    <button
-                      type="button"
-                      className="mt-2 text-xs font-bold text-blue-700 hover:text-blue-800"
-                      onClick={useCurrentMonthDate}
-                    >
-                      Use current month date instead
-                    </button>
-                  </div>
-                )}
+                  placeholder="e.g. Food, Transport, Office"
+                />
               </label>
 
               <label className="block">
