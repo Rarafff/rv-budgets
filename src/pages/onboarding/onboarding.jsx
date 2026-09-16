@@ -1,4 +1,5 @@
 import { useState } from "react";
+import bearPhoneGreeting from "../../assets/bears/bear-phone-greeting.png";
 import { Link, useNavigate } from "react-router-dom";
 import { createBudget } from "../../api/budget";
 import { createTransaction } from "../../api/transaction";
@@ -102,16 +103,13 @@ const Onboarding = () => {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 md:px-8 xl:px-10">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-sm font-black uppercase tracking-wide text-blue-700">
-            Quick Setup
-          </p>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Set up your first dashboard
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Create one wallet, starter budgets, and optional income.
-          </p>
+        <div className="flex items-center gap-3">
+          <div>
+            <p className="text-sm font-black uppercase tracking-wide text-blue-700">Quick Setup</p>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Set up your first dashboard</h1>
+            <p className="mt-1 text-sm text-slate-500">Create one wallet, starter budgets, and optional income.</p>
+          </div>
+          <img src={bearPhoneGreeting} alt="" className="hidden size-20 object-contain sm:block" />
         </div>
         <Link to="/" className="text-sm font-bold text-slate-500 hover:text-blue-700">
           Skip for now

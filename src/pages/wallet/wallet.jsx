@@ -5,6 +5,8 @@ import {
   getWallets,
   updateWallet,
 } from "../../api/wallet";
+import bearCreditCard from "../../assets/bears/bear-credit-card.png";
+import bearPiggyBank from "../../assets/bears/bear-piggy-bank.png";
 
 const walletTypes = ["Bank", "E-Wallet", "Cash", "Credit Card", "Paylater"];
 
@@ -16,6 +18,7 @@ const emptyForm = {
   accountNumber: "",
   creditLimit: "",
   dueDay: "",
+  minimumBalance: "",
 };
 
 const inputClass =
@@ -139,6 +142,17 @@ const WalletCard = ({ wallet, isOpen, onToggle, onEdit, onDelete }) => {
                   {wallet.dueDay ? `Day ${wallet.dueDay}` : "Not set"}
                 </p>
               </div>
+            </div>
+          )}
+
+          {!liability && Number(wallet.minimumBalance || 0) > 0 && (
+            <div>
+              <p className="font-bold uppercase tracking-wide text-slate-400">
+                Minimum Balance Alert
+              </p>
+              <p className="mt-1 font-bold text-[#805323]">
+                {formatMoney(wallet.minimumBalance, wallet.currency)}
+              </p>
             </div>
           )}
 
@@ -310,6 +324,26 @@ const AddWalletModal = ({
               </label>
             </div>
           )}
+
+          {!liability && (
+            <label className="block">
+              <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                Minimum Balance Alert
+              </span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                className={inputClass}
+                placeholder="Optional, e.g. 500000"
+                value={form.minimumBalance}
+                onChange={onChange("minimumBalance")}
+              />
+              <span className="mt-1 block text-xs font-medium text-slate-400">
+                We&apos;ll alert you before this wallet runs too low.
+              </span>
+            </label>
+          )}
         </div>
 
         <button
@@ -410,6 +444,7 @@ const Wallet = () => {
       accountNumber: wallet.accountNumber || "",
       creditLimit: String(wallet.creditLimit ?? ""),
       dueDay: wallet.dueDay ? String(wallet.dueDay) : "",
+      minimumBalance: String(wallet.minimumBalance ?? ""),
     });
     setShowAddModal(true);
   };
@@ -428,6 +463,7 @@ const Wallet = () => {
     accountNumber: form.accountNumber,
     creditLimit: Number(form.creditLimit || 0),
     dueDay: form.dueDay ? Number(form.dueDay) : null,
+    minimumBalance: isLiability(form.type) ? 0 : Number(form.minimumBalance || 0),
   });
 
   const handleSubmit = async (event) => {
@@ -495,13 +531,12 @@ const Wallet = () => {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 md:px-8 xl:px-10">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Wallet
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Organize every money source you own or owe.
-          </p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Wallet</h1>
+            <p className="mt-1 text-sm text-slate-500">Organize every money source you own or owe.</p>
+          </div>
+          <img src={bearCreditCard} alt="" className="hidden size-16 object-contain sm:block" />
         </div>
         <button
           type="button"
@@ -538,8 +573,9 @@ const Wallet = () => {
             Loading wallets...
           </div>
         ) : cashWallets.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-200 bg-white p-5 text-sm font-bold text-slate-500">
-            No cash or savings wallets yet.
+          <div className="companion-empty flex min-h-40 items-center justify-between overflow-hidden px-5 text-sm font-bold">
+            <p className="max-w-xs">No cash or savings wallets yet. Let’s give your first money home.</p>
+            <img src={bearPiggyBank} alt="" className="-my-5 -mr-4 w-32 object-contain" />
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -571,8 +607,9 @@ const Wallet = () => {
             Loading liabilities...
           </div>
         ) : liabilityWallets.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-200 bg-white p-5 text-sm font-bold text-slate-500">
-            No credit or installment wallets yet.
+          <div className="companion-empty flex min-h-40 items-center justify-between overflow-hidden px-5 text-sm font-bold">
+            <p className="max-w-xs">No credit or installment wallets yet.</p>
+            <img src={bearCreditCard} alt="" className="-my-5 -mr-4 w-32 object-contain" />
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "../../i18n/use-translation";
+import bearPiggyBank from "../../assets/bears/bear-piggy-bank.png";
 
 const formatMoney = (amount) =>
   `Rp. ${Number(amount || 0).toLocaleString("id-ID")}`;
@@ -21,15 +22,15 @@ const Budget = ({ summary, isLoading }) => {
   return (
     <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(220px,0.55fr)_minmax(220px,0.55fr)]">
       <div
-        className={`budget-left rounded-xl p-5 shadow-sm sm:p-6 lg:p-7 ${
-          isOverBudget ? "bg-rose-100 text-rose-950" : "bg-blue-100 text-blue-950"
+        className={`budget-left relative overflow-hidden rounded-[1.5rem] p-5 shadow-[0_10px_30px_rgba(112,72,34,0.08)] sm:p-6 lg:p-7 ${
+          isOverBudget ? "bg-rose-100 text-rose-950" : "bg-[#e7f0dd] text-[#3f512f]"
         }`}
       >
         <div className="flex flex-col gap-6">
-          <div className="left-side-budget">
+          <div className="left-side-budget relative z-10 max-w-[75%]">
             <p
               className={`mb-2 text-xs font-bold uppercase tracking-wide md:text-sm ${
-                isOverBudget ? "text-rose-700" : "text-blue-700"
+                isOverBudget ? "text-rose-700" : "text-[#557144]"
               }`}
             >
               {isOverBudget
@@ -46,17 +47,17 @@ const Budget = ({ summary, isLoading }) => {
           </div>
 
           <div>
-            <div className={`w-full rounded-full ${isOverBudget ? "bg-rose-200" : "bg-blue-200"}`}>
+            <div className={`w-full rounded-full ${isOverBudget ? "bg-rose-200" : "bg-[#c9ddb7]"}`}>
               <div
                 className={`flex h-4 items-center justify-center rounded-full p-0.5 text-center text-xs font-medium leading-none text-white ${
-                  isOverBudget ? "bg-rose-600" : "bg-blue-600"
+                  isOverBudget ? "bg-rose-600" : "bg-[#7e9b65]"
                 }`}
                 style={{ width: `${usedPercent}%` }}
               >
                 {hasBudget ? `${Math.round(summary?.budgetUsedPercent || 0)}%` : "0%"}
               </div>
             </div>
-            <p className={`mt-2 text-xs font-medium ${isOverBudget ? "text-rose-700" : "text-blue-700"}`}>
+            <p className={`mt-2 text-xs font-medium ${isOverBudget ? "text-rose-700" : "text-[#557144]"}`}>
               <em>
                 {hasBudget
                   ? isOverBudget
@@ -73,14 +74,15 @@ const Budget = ({ summary, isLoading }) => {
             </p>
           </div>
         </div>
+        {!isOverBudget && <img src={bearPiggyBank} alt="" className="pointer-events-none absolute -bottom-8 -right-5 w-40 rotate-[-6deg] sm:w-48" />}
       </div>
 
-      <div className="income-budget flex min-h-32 flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="income-budget cute-card flex min-h-32 flex-col justify-between p-5">
         <div>
-          <p className="text-sm font-medium text-slate-500">
+          <p className="text-sm font-bold text-[#8d6a4c]">
             {t("dashboard.income")}
           </p>
-          <p className="mt-2 text-2xl font-semibold text-slate-900">
+          <p className="mt-2 text-2xl font-black text-[#4d2f1a]">
             {isLoading ? t("dashboard.loading") : formatMoney(income)}
           </p>
         </div>
@@ -89,12 +91,12 @@ const Budget = ({ summary, isLoading }) => {
         </p>
       </div>
 
-      <div className="expense-budget flex min-h-32 flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="expense-budget cute-card flex min-h-32 flex-col justify-between p-5">
         <div>
-          <p className="text-sm font-medium text-slate-500">
+          <p className="text-sm font-bold text-[#8d6a4c]">
             {t("dashboard.expense")}
           </p>
-          <p className="mt-2 text-2xl font-semibold text-slate-900">
+          <p className="mt-2 text-2xl font-black text-[#4d2f1a]">
             {isLoading ? t("dashboard.loading") : formatMoney(expense)}
           </p>
         </div>

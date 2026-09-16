@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import bearHello from "../../assets/bears/bear-hello.png";
 import {
   changePassword,
   getUserProfile,
@@ -200,6 +201,7 @@ const Profile = () => {
               <span>Joined on {joinedDate}</span>
             </div>
           </div>
+          <img src={bearHello} alt="" className="ml-auto hidden size-24 object-contain sm:block" />
         </div>
 
         <button

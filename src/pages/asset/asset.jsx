@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import bearHomeAsset from "../../assets/bears/bear-home-asset.png";
 import {
   createAsset,
   deleteAsset,
@@ -483,13 +484,12 @@ const Asset = () => {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 md:px-8 xl:px-10">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Assets
-          </h1>
-          <p className="mt-1 text-sm font-medium text-slate-500">
-            Track your wealth across cash, assets, and investments.
-          </p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Assets</h1>
+            <p className="mt-1 text-sm font-medium text-slate-500">Track your wealth across cash, assets, and investments.</p>
+          </div>
+          <img src={bearHomeAsset} alt="" className="hidden size-16 object-contain sm:block" />
         </div>
         <button
           type="button"
@@ -638,8 +638,9 @@ const AssetList = ({ title, assets, emptyText, onEdit, onDelete }) => (
 );
 
 const EmptyState = ({ text }) => (
-  <div className="rounded-xl border border-dashed border-slate-200 bg-white p-5 text-sm font-bold text-slate-500">
-    {text}
+  <div className="companion-empty flex min-h-32 items-center justify-between overflow-hidden px-4 text-sm font-bold">
+    <p className="max-w-[60%]">{text}</p>
+    <img src={bearHomeAsset} alt="" className="-my-5 -mr-4 w-28 object-contain" />
   </div>
 );
 

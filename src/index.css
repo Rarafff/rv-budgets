@@ -1,6 +1,59 @@
 @config "../tailwind.config.js";
 @import "tailwindcss";
 
+@theme {
+  --color-blue-50: #fffaf0;
+  --color-blue-100: #fff2cf;
+  --color-blue-200: #f6dfaa;
+  --color-blue-300: #edc976;
+  --color-blue-400: #d9aa55;
+  --color-blue-500: #aa7941;
+  --color-blue-600: #865629;
+  --color-blue-700: #6d421e;
+  --color-blue-800: #543118;
+  --color-blue-900: #402314;
+  --color-blue-950: #2a160c;
+}
+
+:root {
+  color: #3f2a1d;
+  background: #fffaf0;
+}
+
+body {
+  min-width: 320px;
+  background: #fffaf0;
+}
+
+::selection {
+  background: #fde68a;
+  color: #5b3319;
+}
+
+.cute-card {
+  border: 1px solid #f1dfc2;
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 10px 30px rgba(112, 72, 34, 0.07);
+}
+
+.cute-card:hover {
+  box-shadow: 0 14px 36px rgba(112, 72, 34, 0.11);
+}
+
+.cute-pill {
+  border: 1px solid #efd9a4;
+  background: #fff7df;
+  color: #805323;
+}
+
+.companion-empty {
+  border: 1px dashed #e8cca0;
+  border-radius: 1.25rem;
+  background: linear-gradient(135deg, #fffdf7, #fff4d8);
+  color: #805f43;
+}
+
 .fc .fc-event {
   background: transparent;
   border: 0;
@@ -15,6 +68,25 @@
 .fc .fc-toolbar-title {
   font-size: 1.25rem;
   line-height: 1.75rem;
+}
+
+.fc .fc-button {
+  border: 0;
+  border-radius: 0.75rem;
+  background: #f7e5be;
+  color: #70441f;
+  font-weight: 700;
+}
+
+.fc .fc-button:hover,
+.fc .fc-button:focus {
+  background: #f2ce79;
+  color: #563116;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  background: #8ca07a;
+  color: #fffdf7;
 }
 
 @media (max-width: 640px) {

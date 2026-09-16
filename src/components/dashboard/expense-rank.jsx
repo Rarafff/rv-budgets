@@ -87,9 +87,9 @@ const ExpenseRank = ({ summary, isLoading }) => {
 
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-2">
-      <div className="biggest-expense flex h-72 flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="biggest-expense cute-card flex h-72 flex-col p-5">
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-lg font-bold text-slate-900">
+          <h2 className="text-lg font-black text-[#4d2f1a]">
             {t("dashboard.topExpenses")}
           </h2>
           <p className="text-xs font-medium text-slate-500">
@@ -130,10 +130,10 @@ const ExpenseRank = ({ summary, isLoading }) => {
         </div>
       </div>
 
-      <div className="budget-realization flex h-72 flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="budget-realization cute-card flex min-h-[19rem] flex-col p-5 sm:h-72 sm:min-h-0">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-lg font-bold text-slate-900">
+            <h2 className="text-lg font-black text-[#4d2f1a]">
               {t("dashboard.budgetUsage")}
             </h2>
             <p className="mt-1 text-xs font-medium text-slate-500">
@@ -164,8 +164,8 @@ const ExpenseRank = ({ summary, isLoading }) => {
           ))}
         </div>
 
-        <div className="flex min-h-0 flex-1 items-center justify-center py-2">
-          <div className="relative size-44">
+        <div className="flex min-h-0 flex-1 items-center justify-center py-3 sm:py-2">
+          <div className="relative size-40 sm:size-44">
             <svg className="size-full -rotate-90" viewBox="0 0 100 100">
               <circle
                 cx="50"

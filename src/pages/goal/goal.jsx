@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import bearTarget from "../../assets/bears/bear-target.png";
 import {
   contributeGoal,
   createGoal,
@@ -46,6 +47,30 @@ const formatDate = (date) => {
     month: "short",
     year: "numeric",
   }).format(new Date(date));
+};
+
+const getGoalPlan = (goal) => {
+  const remaining = Math.max(
+    Number(goal.targetAmount || 0) - Number(goal.currentAmount || 0),
+    0,
+  );
+  if (remaining === 0) return { completed: true, remaining };
+  if (!goal.deadline) return { remaining };
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const deadline = new Date(`${goal.deadline}T00:00:00`);
+  const daysLeft = Math.ceil((deadline - today) / 86_400_000);
+  if (daysLeft < 0) return { remaining, overdue: true };
+
+  const weeksLeft = Math.max(1, Math.ceil((daysLeft + 1) / 7));
+  const monthsLeft = Math.max(1, Math.ceil((daysLeft + 1) / 30.44));
+  return {
+    remaining,
+    daysLeft,
+    weeklyAmount: remaining / weeksLeft,
+    monthlyAmount: remaining / monthsLeft,
+  };
 };
 
 const GoalIcon = ({ icon = "target", emergency = false }) => {
@@ -290,6 +315,7 @@ const GoalDetailModal = ({
   onContribute,
   onEdit,
   onDelete,
+  onUseSuggestedAmount,
 }) => {
   if (!goal) return null;
 
@@ -297,6 +323,7 @@ const GoalDetailModal = ({
     Number(goal.targetAmount || 0) - Number(goal.currentAmount || 0),
     0,
   );
+  const plan = getGoalPlan(goal);
 
   return (
     <div
@@ -360,8 +387,61 @@ const GoalDetailModal = ({
           </p>
         </div>
 
+        <div className={`mt-4 rounded-2xl border p-4 ${
+          plan.completed
+            ? "border-emerald-200 bg-emerald-50"
+            : plan.overdue
+              ? "border-rose-200 bg-rose-50"
+              : plan.weeklyAmount
+                ? "border-amber-200 bg-[#fff8e7]"
+                : "border-slate-100 bg-slate-50"
+        }`}>
+          {plan.completed ? (
+            <>
+              <p className="text-sm font-black text-emerald-800">Target tercapai! 🎉</p>
+              <p className="mt-1 text-xs font-semibold text-emerald-700">Beruang ikut senang—saatnya merayakan progres Anda.</p>
+            </>
+          ) : plan.overdue ? (
+            <>
+              <p className="text-sm font-black text-rose-700">Deadline sudah lewat</p>
+              <p className="mt-1 text-xs font-semibold text-rose-600">Masih kurang {formatMoney(plan.remaining)}. Perbarui deadline agar rencana tetap realistis.</p>
+            </>
+          ) : plan.weeklyAmount ? (
+            <>
+              <p className="text-sm font-black text-[#70441f]">Rencana setoran yang pas</p>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="rounded-xl bg-white/80 p-3">
+                  <p className="text-[10px] font-black uppercase tracking-wide text-[#9a6428]">Per minggu</p>
+                  <p className="mt-1 text-sm font-black text-[#70441f]">{formatMoney(plan.weeklyAmount)}</p>
+                </div>
+                <div className="rounded-xl bg-white/80 p-3">
+                  <p className="text-[10px] font-black uppercase tracking-wide text-[#9a6428]">Per bulan</p>
+                  <p className="mt-1 text-sm font-black text-[#70441f]">{formatMoney(plan.monthlyAmount)}</p>
+                </div>
+              </div>
+              <p className="mt-3 text-xs font-semibold text-[#805f43]">Sisa {formatMoney(plan.remaining)} dalam {plan.daysLeft} hari agar target tercapai tepat waktu.</p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm font-black text-slate-700">Tambahkan deadline untuk rencana setoran</p>
+              <p className="mt-1 text-xs font-semibold text-slate-500">Kami akan menghitung kebutuhan setoran mingguan dan bulanan secara otomatis.</p>
+            </>
+          )}
+        </div>
+
         <form className="mt-5 rounded-2xl border border-slate-100 p-4" onSubmit={onContribute}>
-          <h4 className="text-sm font-bold text-slate-900">Add Contribution</h4>
+          <div className="flex items-center justify-between gap-3">
+            <h4 className="text-sm font-bold text-slate-900">Add Contribution</h4>
+            {plan.weeklyAmount && (
+              <button
+                type="button"
+                onClick={() => onUseSuggestedAmount(plan.weeklyAmount)}
+                className="rounded-lg bg-[#fff1c7] px-2.5 py-1.5 text-xs font-black text-[#70441f] hover:bg-[#f8df9a]"
+              >
+                Use weekly plan
+              </button>
+            )}
+          </div>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <label className="block">
               <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
@@ -609,11 +689,12 @@ const Goal = () => {
     }
   };
 
-  const openGoalDetail = async (goal) => {
+  const openGoalDetail = async (goal, suggestedAmount = "") => {
     setSelectedGoal(goal);
     setContributionForm({
       ...emptyContributionForm,
       walletId: goal.linkedWalletId || "",
+      amount: suggestedAmount ? String(Math.ceil(suggestedAmount)) : "",
     });
     setContributions([]);
     await loadContributions(goal.id);
@@ -681,13 +762,12 @@ const Goal = () => {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 md:px-8 xl:px-10">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Goals
-          </h1>
-          <p className="mt-1 text-sm font-medium text-slate-500">
-            Track savings targets outside your monthly spending budget.
-          </p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Goals</h1>
+            <p className="mt-1 text-sm font-medium text-slate-500">Track savings targets outside your monthly spending budget.</p>
+          </div>
+          <img src={bearTarget} alt="" className="hidden size-16 object-contain sm:block" />
         </div>
         <button
           type="button"
@@ -733,8 +813,9 @@ const Goal = () => {
             Loading goals...
           </div>
         ) : goals.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-6 text-sm font-bold text-slate-500">
-            No goals yet. Add your first savings target.
+          <div className="companion-empty flex min-h-48 items-center justify-between overflow-hidden px-6 text-sm font-bold">
+            <p className="max-w-sm">No goals yet. Pick one savings target and let’s chase it together.</p>
+            <img src={bearTarget} alt="" className="-my-6 -mr-5 w-40 object-contain" />
           </div>
         ) : (
           goals.map((goal) => (
@@ -790,8 +871,25 @@ const Goal = () => {
                       />
                     </div>
                   </div>
+                  {getGoalPlan(goal).weeklyAmount && (
+                    <p className="mt-2 text-[10px] font-bold text-[#805323]">
+                      {formatMoney(getGoalPlan(goal).weeklyAmount)}/week
+                    </p>
+                  )}
                 </div>
               </div>
+              {getGoalPlan(goal).weeklyAmount && (
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    openGoalDetail(goal, getGoalPlan(goal).weeklyAmount);
+                  }}
+                  className="mt-4 h-9 rounded-xl bg-[#fff1c7] px-3 text-xs font-black text-[#70441f] transition hover:bg-[#f8df9a]"
+                >
+                  + Add this week&apos;s {formatMoney(getGoalPlan(goal).weeklyAmount)}
+                </button>
+              )}
             </article>
           ))
         )}
@@ -820,6 +918,12 @@ const Goal = () => {
         onContribute={handleContribute}
         onEdit={() => openEditModal(selectedGoal)}
         onDelete={() => handleDelete(selectedGoal)}
+        onUseSuggestedAmount={(amount) =>
+          setContributionForm((current) => ({
+            ...current,
+            amount: String(Math.ceil(amount)),
+          }))
+        }
       />
     </div>
   );

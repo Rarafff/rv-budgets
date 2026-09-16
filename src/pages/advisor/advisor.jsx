@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { askAdvisor, getAdvisorMessages, getAdvisorThreads } from "../../api/advisor";
 import { useTranslation } from "../../i18n/use-translation";
+import bearAdvisor from "../../assets/bears/bear-advisor.png";
 
 const currentMonth = () => new Date().toISOString().slice(0, 7);
 
@@ -437,13 +438,12 @@ const Advisor = () => {
   return (
     <div className="mx-auto flex min-h-[calc(100svh-8rem)] w-full max-w-7xl flex-col px-4 md:h-[calc(100svh-48px)] md:min-h-0 md:px-8 xl:px-10">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            {t("advisor.title")}
-          </h1>
-          <p className="mt-1 text-sm font-medium text-slate-500">
-            {t("advisor.subtitle")}
-          </p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">{t("advisor.title")}</h1>
+            <p className="mt-1 text-sm font-medium text-slate-500">{t("advisor.subtitle")}</p>
+          </div>
+          <img src={bearAdvisor} alt="" className="hidden size-16 object-contain sm:block" />
         </div>
         <div className="flex items-center gap-2">
           <input
@@ -480,9 +480,10 @@ const Advisor = () => {
                   {t("advisor.loadingHistory")}
                 </p>
               ) : threads.length === 0 ? (
-                <p className="rounded-xl border border-dashed border-slate-200 bg-white p-3 text-xs font-semibold leading-5 text-slate-500">
-                  {t("advisor.noChats")}
-                </p>
+                <div className="companion-empty flex min-h-28 items-center justify-between overflow-hidden px-3 text-xs font-semibold leading-5">
+                  <p className="max-w-[58%]">{t("advisor.noChats")}</p>
+                  <img src={bearAdvisor} alt="" className="-my-4 -mr-3 w-20 object-contain" />
+                </div>
               ) : (
                 threads.map((thread) => (
                   <button

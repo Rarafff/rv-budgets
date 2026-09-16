@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import bearTarget from "../../assets/bears/bear-target.png";
 import {
   createBudget,
   deleteBudget,
@@ -263,8 +264,9 @@ const BudgetSection = ({ title, items, onEdit, onDelete }) => {
       </div>
 
       {items.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-slate-200 bg-white p-5 text-sm font-bold text-slate-500">
-          No {title.toLowerCase()} budgets yet.
+        <div className="companion-empty flex min-h-36 items-center justify-between overflow-hidden px-5 text-sm font-bold">
+          <p className="max-w-xs">No {title.toLowerCase()} budgets yet. Start with a small plan for this month.</p>
+          <img src={bearTarget} alt="" className="-my-5 -mr-4 w-28 object-contain" />
         </div>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
@@ -434,13 +436,12 @@ const Budget = () => {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 md:px-8 xl:px-10">
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Set Budget
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Give every rupiah a clear job.
-          </p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Set Budget</h1>
+            <p className="mt-1 text-sm text-slate-500">Give every rupiah a clear job.</p>
+          </div>
+          <img src={bearTarget} alt="" className="hidden size-16 object-contain sm:block" />
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
           <button

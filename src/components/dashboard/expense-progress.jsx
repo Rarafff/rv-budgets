@@ -18,7 +18,7 @@ const ExpenseProgress = ({ summary }) => {
   ).getDate();
 
   return (
-    <div className="expenses-progress mt-6 flex flex-col gap-5 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5 lg:flex-row lg:items-center lg:gap-6">
+    <div className="expenses-progress cute-card mt-6 flex flex-col gap-5 p-4 sm:p-5 lg:flex-row lg:items-center lg:gap-6">
       <div className="calendar-bar relative mx-auto size-20 shrink-0 sm:size-24 lg:mx-0">
         <svg
           className="size-full -rotate-90"
@@ -38,7 +38,7 @@ const ExpenseProgress = ({ summary }) => {
             cy="18"
             r="16"
             fill="none"
-            className="stroke-current text-blue-600"
+            className="stroke-current text-[#7e9b65]"
             strokeWidth="2"
             strokeDasharray={circumference}
             strokeDashoffset={strokeOffset}
@@ -54,7 +54,7 @@ const ExpenseProgress = ({ summary }) => {
       </div>
 
       <div className="expense-progress-title text-center lg:w-44 lg:text-left">
-        <p className="text-lg font-bold text-slate-700">
+        <p className="text-lg font-black text-[#4d2f1a]">
           {t("dashboard.budgetProgress")}
         </p>
         <p className="text-xs font-bold text-slate-500">

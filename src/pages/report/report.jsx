@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getMonthlyReport } from "../../api/report";
 import { useTranslation } from "../../i18n/use-translation";
+import bearAnalytics from "../../assets/bears/bear-analytics.png";
 
 const currentMonth = () => new Date().toISOString().slice(0, 7);
 
@@ -425,8 +426,9 @@ const ExportModal = ({ report, onClose }) => {
 };
 
 const EmptyState = ({ text }) => (
-  <div className="rounded-xl border border-dashed border-slate-200 bg-white p-5 text-sm font-bold text-slate-500">
-    {text}
+  <div className="companion-empty flex min-h-36 items-center justify-between overflow-hidden px-5 text-sm font-bold">
+    <p className="max-w-[60%]">{text}</p>
+    <img src={bearAnalytics} alt="" className="-my-5 -mr-4 w-32 object-contain" />
   </div>
 );
 
