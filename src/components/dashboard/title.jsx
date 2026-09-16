@@ -50,7 +50,7 @@ const buildFinancialStatus = (summary, t) => {
 
 const Title = ({ summary, profile, isLoading }) => {
   const { language, t } = useTranslation();
-  const username = profile?.name || "there";
+  const username = profile?.name || "user";
   const now = new Date();
   const greeting =
     now.getHours() >= 6 && now.getHours() < 18
