@@ -2,6 +2,7 @@ import React from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import { useTranslation } from "../../i18n/use-translation";
+import bearSleeping from "../../assets/bears/bear-sleeping.png";
 
 const formatMoney = (amount) =>
   `Rp. ${Number(amount || 0).toLocaleString("id-ID")}`;
@@ -28,8 +29,8 @@ const CalendarActivites = ({ summary, isLoading }) => {
 
   return (
     <div className="activities-transaction-container mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(340px,0.75fr)] lg:items-stretch">
-      <div className="month-activities calendar-compact flex min-h-[32rem] w-full flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:min-h-[36rem]">
-        <p className="text-lg font-bold">{t("dashboard.thisMonthActivities")}</p>
+      <div className="month-activities calendar-compact cute-card flex min-h-[32rem] w-full flex-col p-4 sm:p-6 lg:min-h-[36rem]">
+        <p className="text-lg font-black text-[#4d2f1a]">{t("dashboard.thisMonthActivities")}</p>
         <div className="mt-4 min-h-0 flex-1">
           <FullCalendar
             plugins={[dayGridPlugin]}
@@ -69,9 +70,9 @@ const CalendarActivites = ({ summary, isLoading }) => {
           />
         </div>
       </div>
-      <div className="new-transactions flex max-h-[36rem] w-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+      <div className="new-transactions cute-card flex max-h-[36rem] w-full flex-col overflow-hidden p-4 sm:p-6">
         <div className="flex items-center justify-between gap-4">
-          <p className="text-lg font-bold">{t("dashboard.newTransactions")}</p>
+          <p className="text-lg font-black text-[#4d2f1a]">{t("dashboard.newTransactions")}</p>
           <p className="text-xs font-medium text-slate-500">
             {t("dashboard.items", { count: transactions.length })}
           </p>
@@ -82,9 +83,10 @@ const CalendarActivites = ({ summary, isLoading }) => {
               {t("dashboard.loadingTransactions")}
             </p>
           ) : transactions.length === 0 ? (
-            <p className="rounded-xl bg-slate-50 px-3 py-3 text-sm font-bold text-slate-500">
-              {t("dashboard.noRecentTransactions")}
-            </p>
+            <div className="flex h-full flex-col items-center justify-center text-center">
+              <img src={bearSleeping} alt="" className="w-32" />
+              <p className="mt-1 text-sm font-bold text-[#8d6a4c]">{t("dashboard.noRecentTransactions")}</p>
+            </div>
           ) : (
             transactions.map((tx) => (
               <div

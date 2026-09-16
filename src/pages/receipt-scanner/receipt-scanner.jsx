@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createTransaction } from "../../api/transaction";
 import { getWallets } from "../../api/wallet";
 import { parseReceipt } from "../../api/receipt";
+import bearReceiptScan from "../../assets/bears/bear-receipt-scan.png";
 
 const inputClass =
   "mt-2 h-11 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:border-blue-300 focus:bg-white";
@@ -186,13 +187,12 @@ const ReceiptScanner = () => {
   return (
     <div className="mx-auto w-full max-w-4xl px-4 md:px-8 xl:px-10">
       <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Scan Receipt
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Upload a receipt, review the AI suggestion, then save it.
-          </p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Scan Receipt</h1>
+            <p className="mt-1 text-sm text-slate-500">Upload a receipt, review the AI suggestion, then save it.</p>
+          </div>
+          <img src={bearReceiptScan} alt="" className="hidden size-16 object-contain sm:block" />
         </div>
       </div>
 
@@ -220,21 +220,7 @@ const ReceiptScanner = () => {
                 />
               ) : (
                 <>
-                  <div className="inline-flex size-16 items-center justify-center rounded-2xl bg-slate-200 text-slate-500">
-                    <svg
-                      className="size-7"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M14.5 4h-5L8 6H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3l-1.5-2Z" />
-                      <circle cx="12" cy="13" r="3" />
-                    </svg>
-                  </div>
+                  <img src={bearReceiptScan} alt="" className="w-28 object-contain" />
                   <p className="mt-5 text-sm font-medium text-slate-500">
                     Choose a receipt image.
                   </p>

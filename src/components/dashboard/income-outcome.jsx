@@ -12,12 +12,12 @@ const IncomeOutcome = ({ summary, isLoading }) => {
 
   return (
     <div className="income-outcome-total grid h-full gap-4 md:grid-cols-3">
-      <div className="income-total flex h-48 w-full flex-col justify-between gap-2 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="income-total cute-card flex h-48 w-full flex-col justify-between gap-2 p-5">
         <div>
-          <h2 className="text-base font-bold text-slate-900">
+          <h2 className="text-base font-black text-[#4d2f1a]">
             {t("dashboard.income")}
           </h2>
-          <p className="mt-8 text-2xl font-semibold">
+          <p className="mt-8 text-2xl font-black text-[#45613b]">
             {isLoading ? t("dashboard.loading") : formatMoney(income)}
           </p>
         </div>
@@ -25,12 +25,12 @@ const IncomeOutcome = ({ summary, isLoading }) => {
           {t("dashboard.thisMonth")}
         </p>
       </div>
-      <div className="outcome-total flex h-48 w-full flex-col justify-between gap-2 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="outcome-total cute-card flex h-48 w-full flex-col justify-between gap-2 p-5">
         <div>
-          <h2 className="text-base font-bold text-slate-900">
+          <h2 className="text-base font-black text-[#4d2f1a]">
             {t("dashboard.outcome")}
           </h2>
-          <p className="mt-8 text-2xl font-semibold">
+          <p className="mt-8 text-2xl font-black text-[#a14f43]">
             {isLoading ? t("dashboard.loading") : formatMoney(outcome)}
           </p>
         </div>
@@ -38,13 +38,13 @@ const IncomeOutcome = ({ summary, isLoading }) => {
           {t("dashboard.thisMonth")}
         </p>
       </div>
-      <div className="emergency-fund-runway flex h-48 w-full flex-col justify-between gap-2 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="emergency-fund-runway cute-card flex h-48 w-full flex-col justify-between gap-2 p-5">
         <div>
-          <h2 className="text-base font-bold text-slate-900">
+          <h2 className="text-base font-black text-[#4d2f1a]">
             {t("dashboard.emergencyFund")}
           </h2>
           <p className="mt-6">
-            <span className="text-2xl font-semibold">
+            <span className="text-2xl font-black text-[#805323]">
               {isLoading ? "-" : emergencyMonths.toFixed(1)}
             </span>{" "}
             <span className="text-sm">{t("dashboard.months")}</span>

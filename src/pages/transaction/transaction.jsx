@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import bearReceiptScan from "../../assets/bears/bear-receipt-scan.png";
 import { useNavigate } from "react-router-dom";
 import {
   createTransaction,
@@ -811,13 +812,12 @@ const Transaction = () => {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 md:px-8 xl:px-10">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Transactions
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Track where your money goes.
-          </p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Transactions</h1>
+            <p className="mt-1 text-sm text-slate-500">Track where your money goes.</p>
+          </div>
+          <img src={bearReceiptScan} alt="" className="hidden size-16 object-contain sm:block" />
         </div>
 
         <div className="flex flex-wrap gap-3">
@@ -879,12 +879,14 @@ const Transaction = () => {
             Loading transactions...
           </div>
         ) : wallets.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-200 bg-white p-5 text-sm font-bold text-slate-500">
-            Create a wallet first before adding transactions.
+          <div className="companion-empty flex min-h-44 items-center justify-between overflow-hidden px-5 text-sm font-bold">
+            <p className="max-w-xs">Create a wallet first before adding transactions.</p>
+            <img src={bearReceiptScan} alt="" className="-my-5 -mr-4 w-36 object-contain" />
           </div>
         ) : groupedTransactions.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-200 bg-white p-5 text-sm font-bold text-slate-500">
-            No transactions yet.
+          <div className="companion-empty flex min-h-44 items-center justify-between overflow-hidden px-5 text-sm font-bold">
+            <p className="max-w-xs">No transactions yet. A receipt scan is a great first step.</p>
+            <img src={bearReceiptScan} alt="" className="-my-5 -mr-4 w-36 object-contain" />
           </div>
         ) : (
           groupedTransactions.map((group) => (

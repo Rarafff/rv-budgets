@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { resetPassword } from "../../api/auth";
-import logo from "../../assets/logo.svg";
+import logo from "../../assets/logo-bear.webp";
 import LanguageToggle from "../../components/language-toggle";
 import { useTranslation } from "../../i18n/use-translation";
 

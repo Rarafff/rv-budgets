@@ -5,10 +5,16 @@ import CalendarActivites from "../../components/dashboard/calendar-activites";
 import ExpenseProgress from "../../components/dashboard/expense-progress";
 import ExpenseRank from "../../components/dashboard/expense-rank";
 import Budget from "../../components/dashboard/budget";
+import WeeklyCheckin from "../../components/dashboard/weekly-checkin";
+import MoneyHealth from "../../components/dashboard/money-health";
+import CashflowForecast from "../../components/dashboard/cashflow-forecast";
 import Title from "../../components/dashboard/title";
 import { getDashboardSummary } from "../../api/dashboard";
 import { getUserProfile } from "../../api/user";
 import { Link } from "react-router-dom";
+import bearCreditCard from "../../assets/bears/bear-credit-card.png";
+import bearTarget from "../../assets/bears/bear-target.png";
+import bearReceiptScan from "../../assets/bears/bear-receipt-scan.png";
 
 const SetupChecklist = ({ summary, isLoading }) => {
   if (isLoading || !summary) return null;
@@ -19,18 +25,21 @@ const SetupChecklist = ({ summary, isLoading }) => {
       description: "Add cash, bank, e-wallet, credit card, or paylater.",
       href: "/wallet",
       done: (summary.wallets || []).length > 0,
+      bear: bearCreditCard,
     },
     {
       label: "Set this month budget",
       description: "Create Needs and Wants budget categories.",
       href: "/budget",
       done: (summary.budgetLimit || 0) > 0,
+      bear: bearTarget,
     },
     {
       label: "Add your first transaction",
       description: "Record income or expense so the dashboard has progress.",
       href: "/transactions",
       done: (summary.recentTransactions || []).length > 0,
+      bear: bearReceiptScan,
     },
   ];
 
@@ -38,17 +47,17 @@ const SetupChecklist = ({ summary, isLoading }) => {
   if (doneCount === items.length) return null;
 
   return (
-    <div className="mt-5 rounded-xl border border-blue-100 bg-white p-4 shadow-sm">
+    <div className="cute-card mt-5 overflow-hidden p-5 sm:p-6">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-black uppercase tracking-wide text-blue-700">
-            Setup Needed
+          <p className="text-sm font-black uppercase tracking-wide text-[#9a6428]">
+            Little steps, big progress
           </p>
-          <h2 className="text-lg font-bold text-slate-900">
-            Finish these steps to activate your dashboard
+          <h2 className="text-lg font-black text-[#4d2f1a]">
+            Let’s make your money tracker feel like home
           </h2>
         </div>
-        <p className="text-sm font-bold text-slate-500">
+        <p className="cute-pill rounded-full px-3 py-1 text-sm font-bold">
           {doneCount}/{items.length} done
         </p>
       </div>
@@ -58,10 +67,10 @@ const SetupChecklist = ({ summary, isLoading }) => {
           <Link
             key={item.label}
             to={item.href}
-            className={`rounded-lg border p-4 transition hover:-translate-y-0.5 hover:shadow-sm ${
+            className={`relative overflow-hidden rounded-2xl border p-4 pr-20 transition hover:-translate-y-0.5 hover:shadow-md ${
               item.done
-                ? "border-emerald-100 bg-emerald-50 text-emerald-900"
-                : "border-slate-200 bg-slate-50 text-slate-900"
+                ? "border-[#cde0bc] bg-[#f2f8ed] text-[#45613b]"
+                : "border-[#f1dfc2] bg-[#fffaf0] text-[#4d2f1a]"
             }`}
           >
             <div className="flex items-center justify-between gap-3">
@@ -69,8 +78,8 @@ const SetupChecklist = ({ summary, isLoading }) => {
               <span
                 className={`rounded-full px-2 py-0.5 text-xs font-bold ${
                   item.done
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "bg-blue-100 text-blue-700"
+                    ? "bg-[#dcecd1] text-[#45613b]"
+                    : "bg-[#f8df9a] text-[#805323]"
                 }`}
               >
                 {item.done ? "Done" : "Start"}
@@ -79,6 +88,7 @@ const SetupChecklist = ({ summary, isLoading }) => {
             <p className="mt-2 text-sm font-medium opacity-75">
               {item.description}
             </p>
+            <img src={item.bear} alt="" className="pointer-events-none absolute -bottom-5 -right-6 w-24 rotate-[-5deg]" />
           </Link>
         ))}
       </div>
@@ -86,7 +96,7 @@ const SetupChecklist = ({ summary, isLoading }) => {
   );
 };
 
-const index = () => {
+const Dashboard = () => {
   const [summary, setSummary] = useState(null);
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -138,6 +148,9 @@ const index = () => {
       )}
       <SetupChecklist summary={summary} isLoading={isLoading} />
       <Budget summary={summary} isLoading={isLoading} />
+      <WeeklyCheckin summary={summary} isLoading={isLoading} />
+      <CashflowForecast summary={summary} isLoading={isLoading} />
+      <MoneyHealth summary={summary} isLoading={isLoading} />
       <ExpenseProgress summary={summary} />
       <CalendarActivites summary={summary} isLoading={isLoading} />
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(340px,0.75fr)] lg:items-stretch">
@@ -153,4 +166,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Dashboard;

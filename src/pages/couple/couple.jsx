@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import bearCouple from "../../assets/bears/bear-couple.png";
 import {
   createCouple,
   getCoupleSummary,
@@ -91,16 +92,13 @@ const Couple = () => {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 md:px-8 xl:px-10">
-      <div>
-        <p className="text-sm font-black uppercase tracking-wide text-blue-700">
-          Couple
-        </p>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-          Couple Budget
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          View combined personal budget and spending for you and your partner.
-        </p>
+      <div className="flex items-center gap-3">
+        <div>
+          <p className="text-sm font-black uppercase tracking-wide text-blue-700">Couple</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Couple Budget</h1>
+          <p className="mt-1 text-sm text-slate-500">View combined personal budget and spending for you and your partner.</p>
+        </div>
+        <img src={bearCouple} alt="" className="hidden size-20 object-contain sm:block" />
       </div>
 
       {error && (
@@ -119,7 +117,12 @@ const Couple = () => {
           Loading couple...
         </div>
       ) : !couple ? (
-        <div className="mt-6 grid gap-5 lg:grid-cols-2">
+        <div className="mt-6">
+          <div className="companion-empty mb-5 flex min-h-36 items-center justify-between overflow-hidden px-5 text-sm font-bold">
+            <p className="max-w-lg">Build shared money habits together. Create a couple space, then invite your partner.</p>
+            <img src={bearCouple} alt="" className="-my-5 -mr-4 w-36 object-contain" />
+          </div>
+          <div className="grid gap-5 lg:grid-cols-2">
           <form
             onSubmit={handleCreate}
             className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
@@ -170,6 +173,7 @@ const Couple = () => {
               Join Couple
             </button>
           </form>
+          </div>
         </div>
       ) : (
         <section className="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
