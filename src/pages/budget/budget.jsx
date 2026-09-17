@@ -6,6 +6,7 @@ import {
   getBudgets,
   updateBudget,
 } from "../../api/budget";
+import CategoryPicker from "../../components/category-picker";
 
 const groups = ["Needs", "Wants"];
 
@@ -179,11 +180,12 @@ const BudgetModal = ({
           <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
             Transaction Category
           </span>
-          <input
+          <CategoryPicker
             className={inputClass}
-            placeholder="e.g. Food"
             value={form.transactionCategory}
             onChange={onChange("transactionCategory")}
+            type="expense"
+            placeholder="Pilih kategori transaksi..."
           />
           <p className="mt-2 text-xs font-semibold text-slate-400">
             Transactions with this category will count toward this budget.

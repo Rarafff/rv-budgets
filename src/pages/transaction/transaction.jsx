@@ -9,6 +9,9 @@ import {
   updateTransaction,
 } from "../../api/transaction";
 import { getWallets } from "../../api/wallet";
+import { createBill } from "../../api/bill";
+import CategoryPicker from "../../components/category-picker";
+import { useTranslation } from "../../i18n/use-translation";
 
 const transactionTypes = [
   { id: "expense", label: "Expense", icon: "↗" },
@@ -27,6 +30,15 @@ const emptyForm = {
   note: "",
   amount: "",
   transactionDate: today(),
+  isRecurringExpense: false,
+};
+
+const nextMonthlyDate = (dateValue) => {
+  const [year, month, day] = String(dateValue).split("-").map(Number);
+  const targetMonth = month === 12 ? 1 : month + 1;
+  const targetYear = month === 12 ? year + 1 : year;
+  const lastDay = new Date(targetYear, targetMonth, 0).getDate();
+  return `${targetYear}-${String(targetMonth).padStart(2, "0")}-${String(Math.min(day, lastDay)).padStart(2, "0")}`;
 };
 
 const inputClass =
@@ -192,194 +204,225 @@ const TransactionModal = ({
   onClose,
   onSubmit,
 }) => {
+  const { t } = useTranslation();
   const activeType = transactionTypes.find((item) => item.id === form.type);
   const isTransfer = form.type === "transfer";
   const walletLabel = form.type === "income" ? "To Wallet" : "From Wallet";
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-black/50 px-4 py-6 sm:items-center"
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-[#3d291b]/60 p-0 backdrop-blur-[2px] sm:items-center sm:px-4 sm:py-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="new-transaction-title"
       onMouseDown={onClose}
     >
       <form
-        className="max-h-[calc(100svh-3rem)] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-5 shadow-xl"
+        className="flex max-h-[92dvh] w-full max-w-md flex-col overflow-hidden rounded-t-[28px] bg-[#fffdf8] shadow-2xl sm:max-h-[calc(100svh-3rem)] sm:rounded-[28px]"
         onMouseDown={(event) => event.stopPropagation()}
         onSubmit={onSubmit}
       >
-        <div className="flex items-center justify-between gap-4">
-          <h2
-            id="new-transaction-title"
-            className="text-lg font-bold text-slate-900"
-          >
-            {editingTransaction ? "Edit Transaction" : "New Transaction"}
-          </h2>
+        <header className="flex shrink-0 items-center justify-between gap-4 border-b border-[#f1dfc2] bg-[#fffaf0] px-6 pb-5 pt-6 sm:px-5 sm:pb-4 sm:pt-5">
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#a96d2d]">
+              Money tracker
+            </p>
+            <h2
+              id="new-transaction-title"
+              className="mt-1 text-xl font-black text-[#4d2f1a]"
+            >
+              {editingTransaction ? "Edit transaksi" : "Tambah transaksi"}
+            </h2>
+          </div>
           <button
             type="button"
-            className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+            className="grid size-10 shrink-0 place-items-center rounded-xl border border-[#ecd7b7] bg-white text-xl font-bold text-[#805323] shadow-sm transition hover:bg-[#fff3d9]"
             onClick={onClose}
-            aria-label="Close transaction modal"
+            aria-label="Tutup modal transaksi"
           >
-            x
+            ×
           </button>
-        </div>
+        </header>
 
-        <div className="mt-5 grid grid-cols-3 gap-2">
-          {transactionTypes.map((item) => {
-            const isActive = item.id === form.type;
+        <div className="min-h-0 overflow-y-auto px-6 pb-6 sm:px-5 sm:pb-5">
+          <div className="mt-5 grid grid-cols-3 gap-2">
+            {transactionTypes.map((item) => {
+              const isActive = item.id === form.type;
 
-            return (
-              <button
-                key={item.id}
-                type="button"
-                className={`flex h-11 items-center justify-center gap-2 rounded-xl border text-xs font-bold transition ${
-                  isActive
-                    ? "border-blue-200 bg-blue-50 text-blue-700 shadow-sm"
-                    : "border-transparent bg-slate-50 text-slate-400 hover:bg-slate-100"
-                }`}
-                onClick={() => onTypeChange(item.id)}
-              >
-                <span
-                  className={`inline-flex size-5 items-center justify-center rounded-md ${
-                    isActive ? "bg-blue-600 text-white" : "bg-white"
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`flex h-11 items-center justify-center gap-2 rounded-xl border text-xs font-bold transition ${
+                    isActive
+                      ? "border-[#e9c985] bg-[#fff3d9] text-[#70441f] shadow-sm"
+                      : "border-transparent bg-[#f7f8fa] text-slate-400 hover:bg-[#f1f3f5]"
                   }`}
+                  onClick={() => onTypeChange(item.id)}
                 >
-                  {item.icon}
-                </span>
-                <span className="hidden sm:inline">{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
+                  <span
+                    className={`inline-flex size-5 items-center justify-center rounded-md ${
+                      isActive ? "bg-[#8b5a2b] text-white" : "bg-white"
+                    }`}
+                  >
+                    {item.icon}
+                  </span>
+                  <span className="hidden sm:inline">{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
 
-        <div className="mt-5 space-y-4">
-          <label className="block">
-            <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
-              Date
-            </span>
-            <input
-              className={inputClass}
-              type="date"
-              value={form.transactionDate}
-              onChange={onChange("transactionDate")}
-              required
-            />
-          </label>
-
-          <label className="block">
-            <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
-              Amount
-            </span>
-            <input
-              className={inputClass}
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="0"
-              value={form.amount}
-              onChange={onChange("amount")}
-              required
-            />
-          </label>
-
-          <label className="block">
-            <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
-              {walletLabel}
-            </span>
-            <select
-              className={inputClass}
-              value={form.walletId}
-              onChange={onChange("walletId")}
-              required
-            >
-              <option value="" disabled>
-                Select wallet...
-              </option>
-              {wallets.map((wallet) => (
-                <option key={wallet.id} value={wallet.id}>
-                  {wallet.name} ({formatMoney(wallet.balance, wallet.currency)})
-                </option>
-              ))}
-            </select>
-          </label>
-
-          {isTransfer ? (
+          <div className="mt-5 space-y-4">
             <label className="block">
               <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                To Wallet
+                Date
+              </span>
+              <input
+                className={inputClass}
+                type="date"
+                value={form.transactionDate}
+                onChange={onChange("transactionDate")}
+                required
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                Amount
+              </span>
+              <input
+                className={inputClass}
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0"
+                value={form.amount}
+                onChange={onChange("amount")}
+                required
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                {walletLabel}
               </span>
               <select
                 className={inputClass}
-                value={form.toWalletId}
-                onChange={onChange("toWalletId")}
+                value={form.walletId}
+                onChange={onChange("walletId")}
                 required
               >
                 <option value="" disabled>
                   Select wallet...
                 </option>
-                {wallets
-                  .filter((wallet) => wallet.id !== form.walletId)
-                  .map((wallet) => (
-                    <option key={wallet.id} value={wallet.id}>
-                      {wallet.name}
-                    </option>
-                  ))}
+                {wallets.map((wallet) => (
+                  <option key={wallet.id} value={wallet.id}>
+                    {wallet.name} (
+                    {formatMoney(wallet.balance, wallet.currency)})
+                  </option>
+                ))}
               </select>
             </label>
-          ) : (
+
+            {isTransfer ? (
+              <label className="block">
+                <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                  To Wallet
+                </span>
+                <select
+                  className={inputClass}
+                  value={form.toWalletId}
+                  onChange={onChange("toWalletId")}
+                  required
+                >
+                  <option value="" disabled>
+                    Select wallet...
+                  </option>
+                  {wallets
+                    .filter((wallet) => wallet.id !== form.walletId)
+                    .map((wallet) => (
+                      <option key={wallet.id} value={wallet.id}>
+                        {wallet.name}
+                      </option>
+                    ))}
+                </select>
+              </label>
+            ) : (
+              <label className="block">
+                <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Category
+                </span>
+                <CategoryPicker
+                  className={inputClass}
+                  value={form.category}
+                  onChange={onChange("category")}
+                  required={form.type === "expense"}
+                  type={form.type}
+                  placeholder="Select category..."
+                />
+              </label>
+            )}
+
             <label className="block">
               <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                Category
+                Title
               </span>
               <input
                 className={inputClass}
-                value={form.category}
-                onChange={onChange("category")}
-                required={form.type === "expense"}
-                placeholder="e.g. Food, Transport, Salary"
+                placeholder="e.g. Kopi Kenangan"
+                value={form.title}
+                onChange={onChange("title")}
+                required
               />
             </label>
-          )}
 
-          <label className="block">
-            <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
-              Title
-            </span>
-            <input
-              className={inputClass}
-              placeholder="e.g. Kopi Kenangan"
-              value={form.title}
-              onChange={onChange("title")}
-              required
-            />
-          </label>
+            <label className="block">
+              <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                Note
+              </span>
+              <input
+                className={inputClass}
+                placeholder="Optional"
+                value={form.note}
+                onChange={onChange("note")}
+              />
+            </label>
 
-          <label className="block">
-            <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
-              Note
-            </span>
-            <input
-              className={inputClass}
-              placeholder="Optional"
-              value={form.note}
-              onChange={onChange("note")}
-            />
-          </label>
+            {!editingTransaction && form.type === "expense" && (
+              <label className="flex items-start gap-3 rounded-xl border border-[#f1dfc2] bg-[#fff8e9] px-4 py-3 text-sm text-[#70441f]">
+                <input
+                  type="checkbox"
+                  checked={form.isRecurringExpense}
+                  onChange={onChange("isRecurringExpense")}
+                  className="mt-0.5 size-4 rounded border-[#d9b77f] text-[#8b5a2b] focus:ring-[#c28b45]"
+                />
+                <span>
+                  <span className="block font-black">
+                    {t("transaction.requiredMonthly")}
+                  </span>
+                  <span className="mt-0.5 block text-xs font-medium text-[#8d6a4c]">
+                    {t("transaction.requiredMonthlyHint")}
+                  </span>
+                </span>
+              </label>
+            )}
+          </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={isSaving}
-          className="mt-6 h-11 w-full rounded-xl bg-blue-600 text-sm font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
-        >
-          {isSaving
-            ? "Saving..."
-            : editingTransaction
-              ? "Save Transaction"
-              : `Add ${activeType?.label ?? "Transaction"}`}
-        </button>
+        <footer className="shrink-0 border-t border-[#f1dfc2] bg-[#fffaf0] px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-5 sm:px-5 sm:pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:pt-4">
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="h-12 w-full rounded-xl bg-[#8b5a2b] text-sm font-black text-white shadow-sm transition hover:bg-[#70441f] disabled:cursor-not-allowed disabled:bg-[#cba982]"
+          >
+            {isSaving
+              ? "Saving..."
+              : editingTransaction
+                ? "Save Transaction"
+                : `Add ${activeType?.label ?? "Transaction"}`}
+          </button>
+        </footer>
       </form>
     </div>
   );
@@ -524,12 +567,13 @@ const BulkTransactionModal = ({
                     </select>
                   </td>
                   <td className="px-3 py-3">
-                    <input
+                    <CategoryPicker
                       className="w-36 rounded-lg border border-transparent bg-transparent px-2 py-2 text-sm outline-none focus:border-blue-200 focus:bg-white"
                       value={row.category}
                       onChange={(event) =>
                         updateRow(row.id, "category", event.target.value)
                       }
+                      type={row.type}
                       placeholder="Category"
                     />
                   </td>
@@ -616,7 +660,8 @@ const Transaction = () => {
 
   const groupedTransactions = useMemo(() => {
     const filtered = transactions.filter((transaction) => {
-      const source = `${transaction.title} ${transaction.category} ${transaction.note} ${transaction.walletName}`.toLowerCase();
+      const source =
+        `${transaction.title} ${transaction.category} ${transaction.note} ${transaction.walletName}`.toLowerCase();
       return source.includes(search.toLowerCase());
     });
 
@@ -656,6 +701,7 @@ const Transaction = () => {
       note: transaction.note || "",
       amount: String(transaction.amount ?? ""),
       transactionDate: transaction.transactionDate || today(),
+      isRecurringExpense: false,
     });
     setShowNewModal(true);
   };
@@ -669,7 +715,10 @@ const Transaction = () => {
   const updateForm = (field) => (event) => {
     setForm((current) => ({
       ...current,
-      [field]: event.target.value,
+      [field]:
+        event.target.type === "checkbox"
+          ? event.target.checked
+          : event.target.value,
     }));
   };
 
@@ -705,14 +754,49 @@ const Transaction = () => {
         ? await updateTransaction(editingTransaction.id, payload)
         : await createTransaction(payload);
 
+      let recurringScheduleError = false;
+      if (
+        !editingTransaction &&
+        form.type === "expense" &&
+        form.isRecurringExpense
+      ) {
+        try {
+          await createBill({
+            walletId: form.walletId,
+            name: form.title,
+            category: form.category,
+            provider: "",
+            amount: Number(form.amount || 0),
+            dueDate: nextMonthlyDate(form.transactionDate),
+            status: "upcoming",
+            note: form.note || "",
+            isRecurring: true,
+            repeatInterval: "monthly",
+            autoPay: true,
+          });
+        } catch {
+          recurringScheduleError = true;
+        }
+      }
+
       setTransactions((current) =>
         editingTransaction
           ? current.map((transaction) =>
-              transaction.id === editingTransaction.id ? response.data : transaction,
+              transaction.id === editingTransaction.id
+                ? response.data
+                : transaction,
             )
           : [response.data, ...current],
       );
-      setMessage(editingTransaction ? "Transaction updated." : "Transaction added.");
+      setMessage(
+        editingTransaction
+          ? "Transaction updated."
+          : recurringScheduleError
+            ? "Transaction added, but the monthly schedule could not be saved."
+            : form.isRecurringExpense
+              ? "Transaction added. Monthly automatic payment is scheduled."
+              : "Transaction added.",
+      );
       closeModal();
       await loadWalletsOnly();
     } catch (requestError) {
@@ -814,10 +898,18 @@ const Transaction = () => {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex items-center gap-3">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Transactions</h1>
-            <p className="mt-1 text-sm text-slate-500">Track where your money goes.</p>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+              Transactions
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Track where your money goes.
+            </p>
           </div>
-          <img src={bearReceiptScan} alt="" className="hidden size-16 object-contain sm:block" />
+          <img
+            src={bearReceiptScan}
+            alt=""
+            className="hidden size-16 object-contain sm:block"
+          />
         </div>
 
         <div className="flex flex-wrap gap-3">
@@ -880,13 +972,25 @@ const Transaction = () => {
           </div>
         ) : wallets.length === 0 ? (
           <div className="companion-empty flex min-h-44 items-center justify-between overflow-hidden px-5 text-sm font-bold">
-            <p className="max-w-xs">Create a wallet first before adding transactions.</p>
-            <img src={bearReceiptScan} alt="" className="-my-5 -mr-4 w-36 object-contain" />
+            <p className="max-w-xs">
+              Create a wallet first before adding transactions.
+            </p>
+            <img
+              src={bearReceiptScan}
+              alt=""
+              className="-my-5 -mr-4 w-36 object-contain"
+            />
           </div>
         ) : groupedTransactions.length === 0 ? (
           <div className="companion-empty flex min-h-44 items-center justify-between overflow-hidden px-5 text-sm font-bold">
-            <p className="max-w-xs">No transactions yet. A receipt scan is a great first step.</p>
-            <img src={bearReceiptScan} alt="" className="-my-5 -mr-4 w-36 object-contain" />
+            <p className="max-w-xs">
+              No transactions yet. A receipt scan is a great first step.
+            </p>
+            <img
+              src={bearReceiptScan}
+              alt=""
+              className="-my-5 -mr-4 w-36 object-contain"
+            />
           </div>
         ) : (
           groupedTransactions.map((group) => (

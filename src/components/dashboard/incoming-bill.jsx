@@ -48,6 +48,7 @@ const emptyForm = {
   note: "",
   isRecurring: false,
   repeatInterval: "",
+  autoPay: false,
 };
 
 const IncomingBill = ({ summary, isLoading, onChanged }) => {
@@ -117,6 +118,7 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
       note: bill.note || "",
       isRecurring: Boolean(bill.isRecurring),
       repeatInterval: bill.repeatInterval || "",
+      autoPay: Boolean(bill.autoPay),
     });
     setShowModal(true);
   };
@@ -137,6 +139,7 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
         ...form,
         amount: Number(form.amount),
         repeatInterval: form.isRecurring ? "monthly" : "",
+        autoPay: form.isRecurring && form.autoPay,
         status: "upcoming",
       };
 
@@ -251,6 +254,11 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
                   {bill.status === "overdue" && (
                     <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold uppercase text-rose-600">
                       {t("dashboard.overdue")}
+                    </span>
+                  )}
+                  {bill.status === "skipped" && (
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase text-amber-700">
+                      Dilewati · saldo kurang
                     </span>
                   )}
                   {bill.isRecurring && (
@@ -409,6 +417,21 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
               />
               {t("dashboard.repeatMonthly")}
             </label>
+
+            {form.isRecurring && (
+              <label className="mt-3 flex items-start gap-3 rounded-lg bg-amber-50 px-3 py-3 text-sm font-bold text-amber-900">
+                <input
+                  type="checkbox"
+                  checked={form.autoPay}
+                  onChange={(event) => updateForm("autoPay", event.target.checked)}
+                  className="mt-0.5 size-4 rounded border-amber-300 text-amber-700 focus:ring-amber-500"
+                />
+                <span>
+                  Bayar otomatis pada tanggal jatuh tempo
+                  <small className="mt-0.5 block font-medium text-amber-700">Jika saldo tidak cukup, tagihan dilewati dan Anda akan diberi notifikasi.</small>
+                </span>
+              </label>
+            )}
 
             {!isLoadingChoices && isMissingSetup && (
               <div className="mt-3 space-y-2">
