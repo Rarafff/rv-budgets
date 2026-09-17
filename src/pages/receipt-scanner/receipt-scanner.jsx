@@ -3,6 +3,7 @@ import { createTransaction } from "../../api/transaction";
 import { getWallets } from "../../api/wallet";
 import { parseReceipt } from "../../api/receipt";
 import bearReceiptScan from "../../assets/bears/bear-receipt-scan.png";
+import CategoryPicker from "../../components/category-picker";
 
 const inputClass =
   "mt-2 h-11 w-full rounded-xl border border-slate-100 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:border-blue-300 focus:bg-white";
@@ -317,11 +318,12 @@ const ReceiptScanner = () => {
                 <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
                   Category
                 </span>
-                <input
+                <CategoryPicker
                   className={inputClass}
                   value={form.category}
                   onChange={updateField("category")}
-                  placeholder="e.g. Food, Transport, Office"
+                  type="expense"
+                  placeholder="Pilih kategori..."
                 />
               </label>
 

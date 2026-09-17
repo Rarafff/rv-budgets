@@ -68,8 +68,12 @@ const Title = ({ summary, profile, isLoading }) => {
   return (
     <div className="dashboard-title relative flex min-h-64 flex-col items-start justify-center gap-3 overflow-hidden rounded-[2rem] border border-[#efd9a4] bg-gradient-to-br from-[#fff4cf] via-[#fffbec] to-[#dfead6] px-6 py-7 shadow-[0_14px_40px_rgba(112,72,34,0.10)] md:min-h-48 md:flex-row md:items-center md:justify-between md:px-8">
       <div className="left-title relative z-10 min-w-0 pr-20 md:pr-0">
-        <p className="mb-1 text-xs font-black uppercase tracking-[0.2em] text-[#9a6428]">Your money buddy</p>
-        <h1 className="text-3xl font-black tracking-tight text-[#4d2f1a]">{t("dashboard.title")}</h1>
+        <p className="mb-1 text-xs font-black uppercase tracking-[0.2em] text-[#9a6428]">
+          Your money buddy
+        </p>
+        <h1 className="text-3xl font-black tracking-tight text-[#4d2f1a]">
+          {t("dashboard.title")}
+        </h1>
         <p className="mt-1 text-lg font-medium text-[#765238]">
           {greeting}, {username}
         </p>
@@ -88,7 +92,11 @@ const Title = ({ summary, profile, isLoading }) => {
           {`${formatDate(firstDateOfMonth)} - ${formatDate(lastDateOfMonth)}`}
         </p>
       </div>
-      <img src={bearCoin} alt="" className="pointer-events-none absolute -bottom-3 -right-3 w-28 rotate-[-8deg] md:-bottom-12 md:-right-6 md:w-56" />
+      <img
+        src={bearCoin}
+        alt=""
+        className="pointer-events-none absolute -bottom-3 -right-3 w-28 rotate-[-8deg] md:-bottom-12 md:-right-6 md:w-56"
+      />
     </div>
   );
 };
