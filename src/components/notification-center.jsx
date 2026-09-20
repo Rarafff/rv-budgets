@@ -170,8 +170,10 @@ const NotificationCenter = ({ summary, compact = false }) => {
       </button>
 
       {isOpen && (
-        <div className={`absolute z-[60] mt-2 overflow-hidden rounded-2xl border border-[#f1dfc2] bg-[#fffdf7] shadow-xl shadow-[#70441f]/15 ${
-          compact ? "right-0 w-[min(22rem,calc(100vw-2rem))]" : "left-0 w-[min(22rem,calc(100vw-2rem))]"
+        <div className={`z-[70] overflow-hidden rounded-2xl border border-[#f1dfc2] bg-[#fffdf7] shadow-xl shadow-[#70441f]/15 ${
+          compact
+            ? "fixed inset-x-4 top-[4.5rem] w-auto sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-[min(22rem,calc(100vw-2rem))]"
+            : "absolute left-0 mt-2 w-[min(22rem,calc(100vw-2rem))]"
         }`}>
           <div className="flex items-center justify-between border-b border-[#f1dfc2] px-4 py-3">
             <div>
@@ -180,8 +182,12 @@ const NotificationCenter = ({ summary, compact = false }) => {
             </div>
             <button
               type="button"
-              onClick={() => setIsOpen(false)}
-              className="rounded-lg px-2 py-1 text-sm font-bold text-[#805323] hover:bg-[#fff3d5]"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                setIsOpen(false);
+              }}
+              className="relative z-10 grid size-9 shrink-0 place-items-center rounded-lg text-lg font-bold text-[#805323] hover:bg-[#fff3d5]"
               aria-label={t("app.closeMenu")}
             >
               ×
