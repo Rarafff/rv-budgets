@@ -7,6 +7,7 @@ import {
 } from "../../api/wallet";
 import bearCreditCard from "../../assets/bears/bear-credit-card.png";
 import bearPiggyBank from "../../assets/bears/bear-piggy-bank.png";
+import { confirmDelete } from "../../lib/alerts";
 
 const walletTypes = ["Bank", "E-Wallet", "Cash", "Credit Card", "Paylater"];
 
@@ -503,7 +504,7 @@ const Wallet = () => {
   };
 
   const handleDelete = async (wallet) => {
-    const confirmed = window.confirm(`Delete ${wallet.name}?`);
+    const confirmed = await confirmDelete(wallet.name);
     if (!confirmed) return;
 
     setError("");

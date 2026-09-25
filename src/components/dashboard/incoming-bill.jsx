@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { createBill, deleteBill, payBill, updateBill } from "../../api/bill";
 import { getWallets } from "../../api/wallet";
 import { useTranslation } from "../../i18n/use-translation";
+import { confirmDelete } from "../../lib/alerts";
 
 const billIcons = {
   card: (
@@ -163,7 +164,7 @@ const IncomingBill = ({ summary, isLoading, onChanged }) => {
   };
 
   const handleDelete = async (bill) => {
-    const confirmed = window.confirm(`Delete ${bill.name} bill?`);
+    const confirmed = await confirmDelete(bill.name);
     if (!confirmed) return;
 
     setIsSaving(true);

@@ -12,6 +12,7 @@ import { getWallets } from "../../api/wallet";
 import { createBill } from "../../api/bill";
 import CategoryPicker from "../../components/category-picker";
 import { useTranslation } from "../../i18n/use-translation";
+import { confirmDelete } from "../../lib/alerts";
 
 const transactionTypes = [
   { id: "expense", label: "Expense", icon: "−" },
@@ -838,7 +839,7 @@ const Transaction = () => {
   };
 
   const handleDelete = async (transaction) => {
-    const confirmed = window.confirm(`Delete ${transaction.title}?`);
+    const confirmed = await confirmDelete(transaction.title);
     if (!confirmed) return;
 
     setError("");

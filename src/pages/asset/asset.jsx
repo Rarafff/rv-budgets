@@ -7,6 +7,7 @@ import {
   updateAsset,
 } from "../../api/asset";
 import { getWallets } from "../../api/wallet";
+import { confirmDelete } from "../../lib/alerts";
 
 const assetTypes = ["Liquid Asset", "Fixed Asset"];
 
@@ -466,7 +467,7 @@ const Asset = () => {
   };
 
   const handleDelete = async (asset) => {
-    const confirmed = window.confirm(`Delete ${asset.name}?`);
+    const confirmed = await confirmDelete(asset.name);
     if (!confirmed) return;
 
     setError("");
