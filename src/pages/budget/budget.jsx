@@ -7,6 +7,7 @@ import {
   updateBudget,
 } from "../../api/budget";
 import CategoryPicker from "../../components/category-picker";
+import { confirmDelete } from "../../lib/alerts";
 
 const groups = ["Needs", "Wants"];
 
@@ -415,7 +416,7 @@ const Budget = () => {
   };
 
   const handleDelete = async (budget) => {
-    const confirmed = window.confirm(`Delete ${budget.category} budget?`);
+    const confirmed = await confirmDelete(budget.category);
     if (!confirmed) return;
 
     setError("");

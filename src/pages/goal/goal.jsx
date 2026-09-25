@@ -9,6 +9,7 @@ import {
   updateGoal,
 } from "../../api/goal";
 import { getWallets } from "../../api/wallet";
+import { confirmDelete } from "../../lib/alerts";
 
 const emptyGoalForm = {
   name: "",
@@ -742,7 +743,7 @@ const Goal = () => {
   };
 
   const handleDelete = async (goal) => {
-    const confirmed = window.confirm(`Delete ${goal.name}?`);
+    const confirmed = await confirmDelete(goal.name);
     if (!confirmed) return;
 
     setError("");

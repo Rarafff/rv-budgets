@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createCategory, deleteCategory, getCategories } from "../api/category";
+import { confirmDelete } from "../lib/alerts";
 
 const CategoryPicker = ({ value, onChange, type = "expense", required = false, className = "", placeholder = "Select category...", showManagement = false }) => {
   const [categories, setCategories] = useState([]);
@@ -51,7 +52,7 @@ const CategoryPicker = ({ value, onChange, type = "expense", required = false, c
   };
 
   const handleDelete = async (category) => {
-    if (!window.confirm(`Hapus kategori ${category.name}?`)) return;
+    if (!await confirmDelete(category.name)) return;
     setError("");
     try {
       await deleteCategory(category.id);
