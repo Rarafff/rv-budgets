@@ -79,6 +79,11 @@ const Sidebar = ({ className = "", onClose, notificationSummary }) => {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/categories" className={linkClass} onClick={onClose}>
+              {t("nav.categories")}
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/goals" className={linkClass} onClick={onClose}>
               {t("nav.goals")}
             </NavLink>

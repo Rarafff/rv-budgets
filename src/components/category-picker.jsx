@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createCategory, deleteCategory, getCategories } from "../api/category";
 
-const CategoryPicker = ({ value, onChange, type = "expense", required = false, className = "", placeholder = "Select category..." }) => {
+const CategoryPicker = ({ value, onChange, type = "expense", required = false, className = "", placeholder = "Select category...", showManagement = false }) => {
   const [categories, setCategories] = useState([]);
   const [isManaging, setIsManaging] = useState(false);
   const [newCategory, setNewCategory] = useState("");
@@ -70,6 +70,7 @@ const CategoryPicker = ({ value, onChange, type = "expense", required = false, c
           <option key={category.id} value={category.name}>{category.name}</option>
         ))}
       </select>
+      {showManagement && <>
       <button type="button" onClick={() => { setNewType(type); setIsManaging(true); }} className="mt-2 text-xs font-bold text-[#805323] hover:text-[#5b3319]">
         + Kelola kategori
       </button>
@@ -113,6 +114,7 @@ const CategoryPicker = ({ value, onChange, type = "expense", required = false, c
           </div>
         </div>
       )}
+      </>}
     </>
   );
 };

@@ -14,10 +14,25 @@ import CategoryPicker from "../../components/category-picker";
 import { useTranslation } from "../../i18n/use-translation";
 
 const transactionTypes = [
-  { id: "expense", label: "Expense", icon: "↗" },
-  { id: "income", label: "Income", icon: "↙" },
+  { id: "expense", label: "Expense", icon: "−" },
+  { id: "income", label: "Income", icon: "+" },
   { id: "transfer", label: "Transfer", icon: "↔" },
 ];
+
+const transactionTypeStyles = {
+  expense: {
+    selected: "border-rose-200 bg-rose-50 text-rose-700 shadow-sm",
+    icon: "bg-rose-600 text-white",
+  },
+  income: {
+    selected: "border-emerald-200 bg-emerald-50 text-emerald-700 shadow-sm",
+    icon: "bg-emerald-600 text-white",
+  },
+  transfer: {
+    selected: "border-sky-200 bg-sky-50 text-sky-700 shadow-sm",
+    icon: "bg-sky-600 text-white",
+  },
+};
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -100,7 +115,7 @@ const TransactionRow = ({
       aria-expanded={isOpen}
     >
       <span
-        className={`inline-flex size-11 shrink-0 items-center justify-center rounded-xl ${
+        className={`inline-flex size-11 shrink-0 items-center justify-center rounded-xl text-2xl font-black leading-none ${
           transaction.type === "income"
             ? "bg-emerald-100 text-emerald-700"
             : transaction.type === "transfer"
@@ -108,8 +123,7 @@ const TransactionRow = ({
               : "bg-rose-100 text-rose-700"
         }`}
       >
-        {transactionTypes.find((item) => item.id === transaction.type)?.icon ||
-          "↗"}
+        {transactionTypes.find((item) => item.id === transaction.type)?.icon || "−"}
       </span>
       <div className="min-w-0">
         <p className="font-bold text-slate-900">{transaction.title}</p>
@@ -248,6 +262,7 @@ const TransactionModal = ({
           <div className="mt-5 grid grid-cols-3 gap-2">
             {transactionTypes.map((item) => {
               const isActive = item.id === form.type;
+              const style = transactionTypeStyles[item.id];
 
               return (
                 <button
@@ -255,14 +270,15 @@ const TransactionModal = ({
                   type="button"
                   className={`flex h-11 items-center justify-center gap-2 rounded-xl border text-xs font-bold transition ${
                     isActive
-                      ? "border-[#e9c985] bg-[#fff3d9] text-[#70441f] shadow-sm"
-                      : "border-transparent bg-[#f7f8fa] text-slate-400 hover:bg-[#f1f3f5]"
+                      ? style.selected
+                      : "border-transparent bg-[#f7f8fa] text-slate-500 hover:bg-[#f1f3f5]"
                   }`}
                   onClick={() => onTypeChange(item.id)}
+                  aria-label={item.label}
                 >
                   <span
-                    className={`inline-flex size-5 items-center justify-center rounded-md ${
-                      isActive ? "bg-[#8b5a2b] text-white" : "bg-white"
+                    className={`inline-flex size-6 items-center justify-center rounded-md text-base font-black leading-none ${
+                      isActive ? style.icon : "bg-white text-slate-400"
                     }`}
                   >
                     {item.icon}
@@ -727,7 +743,12 @@ const Transaction = () => {
       ...current,
       type,
       toWalletId: type === "transfer" ? current.toWalletId : "",
-      category: type === "transfer" ? "Transfer" : current.category,
+      category:
+        type === "transfer"
+          ? "Transfer"
+          : current.category === "Transfer"
+            ? ""
+            : current.category,
     }));
   };
 
