@@ -12,6 +12,7 @@ const Wallet = lazy(() => import("./pages/wallet/wallet.jsx"));
 const Transaction = lazy(() => import("./pages/transaction/transaction.jsx"));
 const ReceiptScanner = lazy(() => import("./pages/receipt-scanner/receipt-scanner.jsx"));
 const Budget = lazy(() => import("./pages/budget/budget.jsx"));
+const Category = lazy(() => import("./pages/category/category.jsx"));
 const Goal = lazy(() => import("./pages/goal/goal.jsx"));
 const Asset = lazy(() => import("./pages/asset/asset.jsx"));
 const Couple = lazy(() => import("./pages/couple/couple.jsx"));
@@ -48,6 +49,7 @@ createRoot(document.getElementById("root")).render(
                 <Route path="/transactions" element={<Transaction />} />
                 <Route path="/receipt-scanner" element={<ReceiptScanner />} />
                 <Route path="/budget" element={<Budget />} />
+                <Route path="/categories" element={<Category />} />
                 <Route path="/goals" element={<Goal />} />
                 <Route path="/assets" element={<Asset />} />
                 <Route path="/couple" element={<Couple />} />
