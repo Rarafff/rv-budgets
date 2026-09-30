@@ -10,8 +10,10 @@ import {
 } from "../../api/transaction";
 import { getWallets } from "../../api/wallet";
 import { createBill } from "../../api/bill";
+import { getCategories } from "../../api/category";
 import CategoryPicker from "../../components/category-picker";
 import SubcategoryPicker from "../../components/subcategory-picker";
+import TransactionCategoryIcon from "../../components/transaction-category-icon";
 import { useTranslation } from "../../i18n/use-translation";
 import { confirmDelete } from "../../lib/alerts";
 
@@ -105,6 +107,7 @@ const TransactionRow = ({
   onToggle,
   onEdit,
   onDelete,
+  categories,
 }) => (
   <article
     className={`rounded-xl border bg-white shadow-sm transition ${
@@ -117,23 +120,13 @@ const TransactionRow = ({
       onClick={onToggle}
       aria-expanded={isOpen}
     >
-      <span
-        className={`inline-flex size-11 shrink-0 items-center justify-center rounded-xl text-2xl font-black leading-none ${
-          transaction.type === "income"
-            ? "bg-emerald-100 text-emerald-700"
-            : transaction.type === "transfer"
-              ? "bg-blue-100 text-blue-700"
-              : "bg-rose-100 text-rose-700"
-        }`}
-      >
-        {transactionTypes.find((item) => item.id === transaction.type)?.icon || "−"}
-      </span>
+      <TransactionCategoryIcon transaction={transaction} categories={categories} size={44} />
       <div className="min-w-0">
         <p className="font-bold text-slate-900">{transaction.title}</p>
         <p className="mt-1 text-xs font-semibold text-slate-500">
           {transaction.type === "transfer"
             ? `${transaction.walletName} → ${transaction.toWalletName}`
-            : transaction.category || "Uncategorized"}
+            : transaction.subcategory || transaction.category || "Uncategorized"}
         </p>
       </div>
       <p
@@ -646,6 +639,7 @@ const Transaction = () => {
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState([]);
   const [wallets, setWallets] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [openTransaction, setOpenTransaction] = useState(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
@@ -667,12 +661,14 @@ const Transaction = () => {
     setError("");
 
     try {
-      const [walletResponse, transactionResponse] = await Promise.all([
+      const [walletResponse, transactionResponse, categoryResponse] = await Promise.all([
         getWallets(),
         getTransactions(),
+        getCategories(),
       ]);
       setWallets(walletResponse.data || []);
       setTransactions(transactionResponse.data || []);
+      setCategories(categoryResponse.data || []);
     } catch (requestError) {
       setError(
         requestError.response?.data?.error ||
@@ -1041,6 +1037,7 @@ const Transaction = () => {
                   <TransactionRow
                     key={transaction.id}
                     transaction={transaction}
+                    categories={categories}
                     isOpen={openTransaction === transaction.id}
                     onToggle={() => toggleTransaction(transaction.id)}
                     onEdit={() => openEditModal(transaction)}

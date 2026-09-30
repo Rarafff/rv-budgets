@@ -44,3 +44,26 @@ export const CategoryIcon = ({ iconID, size = 40, className = "" }) => {
     </span>
   );
 };
+
+export const getTransactionCategoryIcon = (transaction, categories) => {
+  if (!transaction || transaction.type === "transfer") return "";
+
+  const parent = categories.find(
+    (category) =>
+      !category.parentId &&
+      category.type === transaction.type &&
+      category.name === transaction.category,
+  );
+
+  if (!parent) return "";
+
+  const subcategory = transaction.subcategory
+    ? categories.find(
+        (category) =>
+          category.parentId === parent.id &&
+          category.name === transaction.subcategory,
+      )
+    : null;
+
+  return subcategory?.icon || parent.icon || "";
+};

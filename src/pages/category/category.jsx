@@ -6,18 +6,26 @@ import { confirmDelete } from "../../lib/alerts";
 
 const SubcategoryList = ({ category, items, onAdd, onDelete, savingParentID, deletingID, t }) => {
   const [name, setName] = useState("");
+  const [icon, setIcon] = useState("");
+  const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+  const availableIcons = categoryIcons.filter((item) => item.types.includes(category.type));
   const submit = async (event) => {
     event.preventDefault();
     const trimmedName = name.trim();
     if (!trimmedName) return;
-    await onAdd(category, trimmedName);
-    setName("");
+    const wasAdded = await onAdd(category, trimmedName, icon);
+    if (wasAdded) {
+      setName("");
+      setIcon("");
+      setIsIconPickerOpen(false);
+    }
   };
 
   return <div className="mt-3 border-t border-[#f1dfc2] pt-3">
     <p className="text-xs font-black uppercase tracking-wide text-[#8d6a4c]">{t("category.subcategories")}</p>
     {items.length > 0 && <div className="mt-2 flex flex-wrap gap-2">
-      {items.map((item) => <span key={item.id} className="inline-flex items-center gap-1 rounded-lg bg-[#fff3d5] px-2 py-1 text-xs font-bold text-[#70441f]">
+      {items.map((item) => <span key={item.id} className="inline-flex items-center gap-1.5 rounded-lg bg-[#fff3d5] px-2 py-1 text-xs font-bold text-[#70441f]">
+        {item.icon ? <CategoryIcon iconID={item.icon} size={22} /> : <span className={`grid size-5 place-items-center rounded text-xs font-black ${category.type === "expense" ? "bg-rose-50 text-rose-700" : "bg-emerald-50 text-emerald-700"}`}>{category.type === "expense" ? "−" : "+"}</span>}
         {item.name}
         <button type="button" onClick={() => onDelete(item)} disabled={deletingID === item.id} className="grid size-5 place-items-center rounded text-rose-600 hover:bg-rose-100" aria-label={`${t("category.delete")} ${item.name}`}>×</button>
       </span>)}
@@ -26,6 +34,18 @@ const SubcategoryList = ({ category, items, onAdd, onDelete, savingParentID, del
       <input value={name} onChange={(event) => setName(event.target.value)} placeholder={t("category.subcategoryPlaceholder")} maxLength={60} className="h-11 min-w-0 flex-1 rounded-xl border border-[#f1dfc2] bg-white px-3 text-sm text-[#4d2f1a] outline-none focus:border-[#aa7941]" />
       <button type="submit" disabled={savingParentID === category.id} className="h-11 shrink-0 rounded-xl border border-[#d5aa70] bg-[#fffaf0] px-3 text-xs font-black text-[#70441f] hover:bg-[#fff3d5] disabled:opacity-60">{savingParentID === category.id ? t("category.adding") : t("category.addSubcategory")}</button>
     </form>
+    <div className="mt-2">
+      <button type="button" onClick={() => setIsIconPickerOpen((current) => !current)} aria-expanded={isIconPickerOpen} className="inline-flex min-h-11 items-center gap-2 rounded-lg px-2 text-xs font-black text-[#805323] hover:bg-[#fff3d5]">
+        {icon ? <CategoryIcon iconID={icon} size={24} /> : <span className="grid size-6 place-items-center rounded-md bg-white text-base font-black text-[#805323]">—</span>}
+        {t("category.iconOptional")}
+      </button>
+      {isIconPickerOpen && <div className="mt-2 flex flex-wrap gap-2 rounded-xl border border-[#f1dfc2] bg-white p-2">
+        <button type="button" onClick={() => setIcon("")} className={`grid size-11 place-items-center rounded-xl border text-xs font-black ${icon === "" ? "border-[#aa7941] bg-[#fff3d5] text-[#70441f]" : "border-[#f1dfc2] bg-white text-[#8d6a4c]"}`} aria-label={t("category.noIcon")}>—</button>
+        {availableIcons.map((item) => <button key={item.id} type="button" onClick={() => setIcon(item.id)} className={`grid size-11 place-items-center rounded-xl border transition ${icon === item.id ? "border-[#aa7941] bg-[#fff3d5] ring-2 ring-[#f4dfbb]" : "border-[#f1dfc2] bg-white hover:bg-[#fffaf0]"}`} aria-label={item.label} title={item.label}>
+          <CategoryIcon iconID={item.id} size={36} />
+        </button>)}
+      </div>}
+    </div>
   </div>;
 };
 
@@ -135,15 +155,17 @@ const Category = () => {
     }
   };
 
-  const handleAddSubcategory = async (parent, subcategoryName) => {
+  const handleAddSubcategory = async (parent, subcategoryName, icon) => {
     setSavingParentID(parent.id);
     setError("");
     try {
-      await createCategory({ name: subcategoryName, type: parent.type, parentId: parent.id });
+      await createCategory({ name: subcategoryName, type: parent.type, parentId: parent.id, icon });
       await loadCategories();
       window.dispatchEvent(new Event("budgets:categories-changed"));
+      return true;
     } catch (requestError) {
       setError(requestError.response?.data?.error || t("category.saveError"));
+      return false;
     } finally {
       setSavingParentID("");
     }
