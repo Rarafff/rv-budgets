@@ -11,6 +11,7 @@ import {
 import { getWallets } from "../../api/wallet";
 import { createBill } from "../../api/bill";
 import CategoryPicker from "../../components/category-picker";
+import SubcategoryPicker from "../../components/subcategory-picker";
 import { useTranslation } from "../../i18n/use-translation";
 import { confirmDelete } from "../../lib/alerts";
 
@@ -43,6 +44,7 @@ const emptyForm = {
   type: "expense",
   title: "",
   category: "",
+  subcategory: "",
   note: "",
   amount: "",
   transactionDate: today(),
@@ -373,10 +375,18 @@ const TransactionModal = ({
                 <CategoryPicker
                   className={inputClass}
                   value={form.category}
-                  onChange={onChange("category")}
+                  onChange={(event) => setForm((current) => ({ ...current, category: event.target.value, subcategory: "" }))}
                   required={form.type === "expense"}
                   type={form.type}
                   placeholder="Select category..."
+                />
+                <SubcategoryPicker
+                  className={inputClass}
+                  category={form.category}
+                  type={form.type}
+                  value={form.subcategory}
+                  onChange={onChange("subcategory")}
+                  placeholder="Select subcategory..."
                 />
               </label>
             )}
@@ -715,6 +725,7 @@ const Transaction = () => {
       type: transaction.type || "expense",
       title: transaction.title || "",
       category: transaction.category || "",
+      subcategory: transaction.subcategory || "",
       note: transaction.note || "",
       amount: String(transaction.amount ?? ""),
       transactionDate: transaction.transactionDate || today(),
@@ -750,6 +761,7 @@ const Transaction = () => {
           : current.category === "Transfer"
             ? ""
             : current.category,
+      subcategory: "",
     }));
   };
 
@@ -759,6 +771,7 @@ const Transaction = () => {
     type: source.type,
     title: source.title,
     category: source.type === "transfer" ? "Transfer" : source.category,
+    subcategory: source.type === "transfer" ? "" : source.subcategory,
     note: source.note || "",
     amount: Number(source.amount || 0),
     transactionDate: source.transactionDate,

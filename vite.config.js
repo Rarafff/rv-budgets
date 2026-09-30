@@ -11,8 +11,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Budgets',
-        short_name: 'Budgets',
+        name: 'Ber-Uang',
+        short_name: 'Ber-Uang',
         description: 'Personal budget and finance tracker.',
         theme_color: '#1d4ed8',
         background_color: '#eff6ff',
