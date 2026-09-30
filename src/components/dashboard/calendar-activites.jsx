@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import { getCategories } from "../../api/category";
+import TransactionCategoryIcon from "../transaction-category-icon";
 import { useTranslation } from "../../i18n/use-translation";
 import bearSleeping from "../../assets/bears/bear-sleeping.png";
 
@@ -17,6 +19,22 @@ const signedAmount = (transaction) => {
 const CalendarActivites = ({ summary, isLoading }) => {
   const { t } = useTranslation();
   const transactions = summary?.recentTransactions || [];
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await getCategories();
+        setCategories(response.data || []);
+      } catch {
+        setCategories([]);
+      }
+    };
+
+    loadCategories();
+    window.addEventListener("budgets:categories-changed", loadCategories);
+    return () => window.removeEventListener("budgets:categories-changed", loadCategories);
+  }, []);
   const events = (summary?.calendarEvents || []).map((event) => ({
     title: `${event.type === "income" ? "+" : event.type === "expense" ? "-" : ""}${Number(
       event.amount || 0,
@@ -93,12 +111,10 @@ const CalendarActivites = ({ summary, isLoading }) => {
                 key={tx.id}
                 className="transaction-lists flex w-full flex-row items-center gap-3 border-b border-slate-100 py-3 last:border-b-0"
               >
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-black uppercase text-blue-700">
-                  {tx.type.slice(0, 1)}
-                </div>
+                <TransactionCategoryIcon transaction={tx} categories={categories} size={44} />
                 <div className="Category-desc-container min-w-0">
                   <p className="font-medium text-slate-900">
-                    {tx.category || tx.type}
+                    {tx.subcategory || tx.category || tx.type}
                   </p>
                   <p className="truncate text-sm text-slate-500">
                     {tx.title} - {tx.walletName}
