@@ -27,10 +27,10 @@ const App = () => {
         <div className="flex items-center gap-3">
           <img
             src={logo}
-            alt="Budgets logo"
+            alt="Ber-Uang logo"
             className="h-8 w-8 rounded-lg object-cover"
           />
-          <div className="text-lg font-bold tracking-tight text-[#70441f]">Budgets.</div>
+          <div className="text-lg font-bold tracking-tight text-[#70441f]">Ber-Uang</div>
         </div>
         <div className="flex items-center gap-2">
           <LanguageToggle className="hidden min-[420px]:flex" />

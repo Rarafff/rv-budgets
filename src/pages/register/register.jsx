@@ -126,7 +126,7 @@ const Register = () => {
           </div>
           <img
             src={logo}
-            alt="Budgets logo"
+            alt="Ber-Uang logo"
             className="mx-auto size-20 rounded-3xl object-cover"
           />
           <h1 className="mt-6 text-4xl font-black tracking-tight">

@@ -4,9 +4,34 @@ import { useTranslation } from "../../i18n/use-translation";
 import { CategoryIcon, categoryIcons } from "../../components/category-icon";
 import { confirmDelete } from "../../lib/alerts";
 
-const CategoryGroup = ({ type, categories, onDelete, deletingID, t }) => {
+const SubcategoryList = ({ category, items, onAdd, onDelete, savingParentID, deletingID, t }) => {
+  const [name, setName] = useState("");
+  const submit = async (event) => {
+    event.preventDefault();
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+    await onAdd(category, trimmedName);
+    setName("");
+  };
+
+  return <div className="mt-3 border-t border-[#f1dfc2] pt-3">
+    <p className="text-xs font-black uppercase tracking-wide text-[#8d6a4c]">{t("category.subcategories")}</p>
+    {items.length > 0 && <div className="mt-2 flex flex-wrap gap-2">
+      {items.map((item) => <span key={item.id} className="inline-flex items-center gap-1 rounded-lg bg-[#fff3d5] px-2 py-1 text-xs font-bold text-[#70441f]">
+        {item.name}
+        <button type="button" onClick={() => onDelete(item)} disabled={deletingID === item.id} className="grid size-5 place-items-center rounded text-rose-600 hover:bg-rose-100" aria-label={`${t("category.delete")} ${item.name}`}>×</button>
+      </span>)}
+    </div>}
+    <form onSubmit={submit} className="mt-3 flex gap-2">
+      <input value={name} onChange={(event) => setName(event.target.value)} placeholder={t("category.subcategoryPlaceholder")} maxLength={60} className="h-11 min-w-0 flex-1 rounded-xl border border-[#f1dfc2] bg-white px-3 text-sm text-[#4d2f1a] outline-none focus:border-[#aa7941]" />
+      <button type="submit" disabled={savingParentID === category.id} className="h-11 shrink-0 rounded-xl border border-[#d5aa70] bg-[#fffaf0] px-3 text-xs font-black text-[#70441f] hover:bg-[#fff3d5] disabled:opacity-60">{savingParentID === category.id ? t("category.adding") : t("category.addSubcategory")}</button>
+    </form>
+  </div>;
+};
+
+const CategoryGroup = ({ type, categories, onDelete, onAddSubcategory, savingParentID, deletingID, t }) => {
   const isExpense = type === "expense";
-  const items = categories.filter((category) => category.type === type);
+  const items = categories.filter((category) => category.type === type && !category.parentId);
 
   return (
     <section className="rounded-2xl border border-[#f1dfc2] bg-white p-5 shadow-sm">
@@ -25,7 +50,8 @@ const CategoryGroup = ({ type, categories, onDelete, deletingID, t }) => {
           <p className="rounded-xl bg-[#fffaf0] px-4 py-3 text-sm font-semibold text-[#8d6a4c]">{t("category.empty")}</p>
         ) : (
           items.map((category) => (
-            <div key={category.id} className="flex items-center justify-between gap-3 rounded-xl bg-[#fffaf0] px-4 py-3">
+            <div key={category.id} className="rounded-xl bg-[#fffaf0] px-4 py-3">
+              <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">
                 {category.icon ? <CategoryIcon iconID={category.icon} size={34} /> : <span className={`grid size-8 place-items-center rounded-lg text-base font-black ${isExpense ? "bg-rose-50 text-rose-700" : "bg-emerald-50 text-emerald-700"}`}>{isExpense ? "−" : "+"}</span>}
                 <span className="min-w-0 truncate text-sm font-bold text-[#4d2f1a]">{category.name}</span>
@@ -38,6 +64,8 @@ const CategoryGroup = ({ type, categories, onDelete, deletingID, t }) => {
               >
                 {deletingID === category.id ? t("category.deleting") : t("category.delete")}
               </button>
+              </div>
+              <SubcategoryList category={category} items={categories.filter((item) => item.parentId === category.id)} onAdd={onAddSubcategory} onDelete={onDelete} savingParentID={savingParentID} deletingID={deletingID} t={t} />
             </div>
           ))
         )}
@@ -54,6 +82,7 @@ const Category = () => {
   const [icon, setIcon] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [deletingID, setDeletingID] = useState("");
+  const [savingParentID, setSavingParentID] = useState("");
   const [error, setError] = useState("");
   const availableIcons = categoryIcons.filter((item) => item.types.includes(type));
 
@@ -106,6 +135,20 @@ const Category = () => {
     }
   };
 
+  const handleAddSubcategory = async (parent, subcategoryName) => {
+    setSavingParentID(parent.id);
+    setError("");
+    try {
+      await createCategory({ name: subcategoryName, type: parent.type, parentId: parent.id });
+      await loadCategories();
+      window.dispatchEvent(new Event("budgets:categories-changed"));
+    } catch (requestError) {
+      setError(requestError.response?.data?.error || t("category.saveError"));
+    } finally {
+      setSavingParentID("");
+    }
+  };
+
   return (
     <div className="mx-auto w-full max-w-5xl px-4 md:px-8 xl:px-10">
       <header className="max-w-2xl">
@@ -146,8 +189,8 @@ const Category = () => {
       </form>
 
       <div className="mt-6 grid gap-5 md:grid-cols-2">
-        <CategoryGroup type="expense" categories={categories} onDelete={handleDelete} deletingID={deletingID} t={t} />
-        <CategoryGroup type="income" categories={categories} onDelete={handleDelete} deletingID={deletingID} t={t} />
+        <CategoryGroup type="expense" categories={categories} onDelete={handleDelete} onAddSubcategory={handleAddSubcategory} savingParentID={savingParentID} deletingID={deletingID} t={t} />
+        <CategoryGroup type="income" categories={categories} onDelete={handleDelete} onAddSubcategory={handleAddSubcategory} savingParentID={savingParentID} deletingID={deletingID} t={t} />
       </div>
     </div>
   );

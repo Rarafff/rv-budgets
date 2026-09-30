@@ -46,7 +46,7 @@ export const translations = {
     "auth.registrationFailed": "Pendaftaran gagal. Silakan coba lagi.",
     "auth.haveAccount": "Sudah punya akun?",
     "auth.terms":
-      "Dengan mendaftar, Anda menyetujui Syarat & Ketentuan dan Kebijakan Privasi Budgets.",
+      "Dengan mendaftar, Anda menyetujui Syarat & Ketentuan dan Kebijakan Privasi Ber-Uang.",
     "auth.forgotTitle": "Lupa Kata Sandi",
     "auth.forgotSubtitle":
       "Masukkan email untuk membuat token reset kata sandi.",
@@ -70,6 +70,9 @@ export const translations = {
     "category.namePlaceholder": "Nama kategori",
     "category.iconOptional": "Ikon opsional",
     "category.noIcon": "Tanpa ikon",
+    "category.subcategories": "Subkategori",
+    "category.subcategoryPlaceholder": "Nama subkategori",
+    "category.addSubcategory": "Tambah subkategori",
     "category.expense": "Pengeluaran",
     "category.expenseHint": "Kategori untuk uang yang keluar.",
     "category.income": "Pemasukan",
@@ -358,7 +361,7 @@ export const translations = {
     "auth.registrationFailed": "Registration failed. Please try again.",
     "auth.haveAccount": "Already have an account?",
     "auth.terms":
-      "By registering, you agree to Budgets' Terms & Conditions and Privacy Policy.",
+      "By registering, you agree to Ber-Uang's Terms & Conditions and Privacy Policy.",
     "auth.forgotTitle": "Forgot Password",
     "auth.forgotSubtitle": "Enter your email to create a password reset token.",
     "auth.resetLinkCreated": "Reset link created.",
@@ -381,6 +384,9 @@ export const translations = {
     "category.namePlaceholder": "Category name",
     "category.iconOptional": "Optional icon",
     "category.noIcon": "No icon",
+    "category.subcategories": "Subcategories",
+    "category.subcategoryPlaceholder": "Subcategory name",
+    "category.addSubcategory": "Add subcategory",
     "category.expense": "Expense",
     "category.expenseHint": "Categories for money going out.",
     "category.income": "Income",

@@ -27,7 +27,7 @@ const CategoryPicker = ({ value, onChange, type = "expense", required = false, c
   }, []);
 
   const visibleCategories = useMemo(() => {
-    const filtered = categories.filter((category) => category.type === type);
+    const filtered = categories.filter((category) => category.type === type && !category.parentId);
     if (value && !filtered.some((category) => category.name === value)) {
       return [{ id: `current-${value}`, name: value, type }, ...filtered];
     }

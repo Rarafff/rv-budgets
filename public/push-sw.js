@@ -7,11 +7,11 @@ self.addEventListener("push", (event) => {
   }
 
   event.waitUntil(
-    self.registration.showNotification(payload.title || "Budgets. Money moment", {
+    self.registration.showNotification(payload.title || "Ber-Uang. Money moment", {
       body: payload.body || "Ada pembaruan untuk uang Anda.",
       icon: "/pwa-192x192.png",
       badge: "/pwa-192x192.png",
-      tag: "budgets-money-moment",
+      tag: "ber-uang-money-moment",
       renotify: false,
       data: { url: payload.url || "/" },
     }),
